@@ -869,7 +869,38 @@ window.HSP.ACTIVITIES = [
     tags:["fine_motor","household","language","measuring"], modes:["full","spanish"], repeatable:true,
     materials:["a measuring cup, a bowl, dry rice or oats"],
     steps:["Sit at the kitchen counter together.","Pour rice from one cup to the bowl.","Say 'pour, dump, scoop' as you go."],
-    safety:"No stove. No knives. Stay arm's-length." }
+    safety:"No stove. No knives. Stay arm's-length." },
+  /* --- "Things That Go Together" / matching pairs (Unit 8) --- */
+  { id:"match_socks_shoes", title:"What goes together? Socks & shoes", kind:"sorting", minutes:6, prep:"low", mess:"none", supervision:"low",
+    tags:["matching","sorting","household","language","find_it"], modes:["full","spanish","low_prep"], repeatable:true,
+    materials:["a sock and a shoe","a cup and a spoon","a hat and a coat"],
+    steps:["Lay out a few familiar pairs, then mix them up.","Hold up one item: 'What goes with the sock?'","Cheer the match and name both: 'sock and shoe go together!'"],
+    safety:"None." },
+  { id:"match_kitchen_pairs", title:"Kitchen things that go together", kind:"household", minutes:6, prep:"low", mess:"none", supervision:"medium",
+    tags:["matching","sorting","household","language"], modes:["full","spanish","low_prep"], repeatable:true,
+    materials:["a cup and a lid","a bowl and a spoon","a pot and its lid"],
+    steps:["Set out cups, bowls, lids, and spoons all mixed up.","Find each pair together: 'The lid goes on the pot!'","Let him try fitting each lid or pairing each spoon to a bowl."],
+    safety:"Plastic only — no glass or sharp items." },
+  { id:"match_lids_containers", title:"Match the lids to the containers", kind:"fine_motor", minutes:6, prep:"low", mess:"none", supervision:"medium",
+    tags:["matching","sorting","fine_motor","problem_solving"], modes:["full","spanish","low_prep"], repeatable:true,
+    materials:["3-4 plastic containers with matching lids"],
+    steps:["Mix the containers and lids in a pile.","'Which lid goes with this one?' Try each lid together.","Snap the matching lid on. Cheer each pair that fits."],
+    safety:"Use containers too big to be a choking hazard." },
+  { id:"match_animal_baby", title:"Animal & baby match", kind:"language", minutes:5, prep:"low", mess:"none", supervision:"low",
+    tags:["matching","language","pretend","vocabulary"], modes:["full","spanish","low_prep"], repeatable:true,
+    materials:["toy animals or animal picture cards (grown-ups and babies)"],
+    steps:["Line up a few animals: 'Here is the mama cow.'","'Where is the baby cow?' Help him find the pair.","Make the animal sound together for each pair."],
+    safety:"None." },
+  { id:"match_picture_hunt", title:"Things-that-go-together hunt", kind:"language", minutes:6, prep:"none", mess:"none", supervision:"low",
+    tags:["matching","find_it","language","vocabulary"], modes:["full","spanish","low_prep"], repeatable:true,
+    materials:[],
+    steps:["Name a pair: 'toothbrush and toothpaste.'","Walk around and find both items together.","Try more pairs: pillow & blanket, shoe & sock, cup & water."],
+    safety:"None." },
+  { id:"match_sock_pairs", title:"Pair up the socks", kind:"sorting", minutes:6, prep:"none", mess:"none", supervision:"low",
+    tags:["matching","sorting","household","fine_motor","colors"], modes:["full","spanish","low_prep"], repeatable:true,
+    materials:["a basket of clean socks"],
+    steps:["Dump clean socks in a pile.","Find two that match: 'These go together!'","Roll or fold each pair as you find it."],
+    safety:"Clean laundry only." }
 ];
 window.HSP.ACTIVITIES_QUERY = function (opts) {
   const recent = opts.recentIds || [];
@@ -1095,7 +1126,18 @@ window.HSP.planGenerator = (function () {
     if (skillRot.primary === "predicting") focusTags.push("predicting", "read_aloud");
     if (skillRot.primary === "recall_retell") focusTags.push("language");
 
-    /* 1) Skill-aligned activity comes FIRST so today's main idea is centered. */
+    /* 0) A unit-themed activity LEADS the plan so the day clearly matches the
+       current curriculum unit (e.g. a pairs/matching activity on "Things That
+       Go Together"). Prefers the unit's most specific tag, then any unit tag. */
+    const themeTags = senseFocus ? [senseFocus] : unitFocus;
+    let unitThemeActivity = null;
+    if (themeTags.length) {
+      unitThemeActivity = pickActivity(rng,
+        Object.assign({}, baseQ, { anyTag: [themeTags[0]] }),
+        Object.assign({}, baseQ, { anyTag: themeTags }));
+    }
+
+    /* 1) Skill-aligned activity keeps the day's skill rotation represented. */
     let skillActivity = null;
     if (skillRot.primary === "alphabet" || skillRot.secondary === "numbers") {
       skillActivity = pickActivity(rng, Object.assign({}, baseQ, { anyTag: [skillRot.primary, skillRot.secondary].filter(Boolean) }));
@@ -1201,7 +1243,7 @@ window.HSP.planGenerator = (function () {
 
     const allChosen = [];
     function add(a) { if (a && allChosen.indexOf(a) === -1) allChosen.push(a); }
-    add(skillActivity); add(sensory); add(movement); add(language); add(coloring); add(findItGame);
+    add(unitThemeActivity); add(skillActivity); add(sensory); add(movement); add(language); add(coloring); add(findItGame);
 
     const targetTotal = mode.activitiesCount;
     /* Filler also prefers today's focus tags so we don't slip in off-theme activities. */
