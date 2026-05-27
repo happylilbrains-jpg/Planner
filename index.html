@@ -1,0 +1,1864 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Johnny's Homeschool Planner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#FFF7E6;
+  --bg-paper:#FFFDF7;
+  --surface:#FFFFFF;
+  --ink:#2A2335;
+  --muted:#6E6580;
+  --line:rgba(42,35,53,0.10);
+  --line-hi:rgba(42,35,53,0.22);
+  --shadow:0 2px 0 rgba(42,35,53,0.06), 0 6px 24px rgba(42,35,53,0.08);
+  --shadow-lift:0 4px 0 rgba(42,35,53,0.08), 0 12px 32px rgba(42,35,53,0.12);
+  --radius:18px;
+  --radius-sm:12px;
+  --radius-pill:999px;
+
+  --c-red:#E63946;        --c-red-soft:#FFE2E5;
+  --c-orange:#F4A261;     --c-orange-soft:#FFEDD8;
+  --c-yellow:#F9C74F;     --c-yellow-soft:#FFF5D1;
+  --c-green:#43AA8B;      --c-green-soft:#D9F2E8;
+  --c-blue:#4A90E2;       --c-blue-soft:#DCEAFB;
+  --c-purple:#9B5DE5;     --c-purple-soft:#EDDFFB;
+  --c-pink:#FF6B9D;       --c-pink-soft:#FFD8E5;
+  --c-teal:#48BFE3;       --c-teal-soft:#D6F0F9;
+}
+html,body{
+  background:var(--bg);
+  background-image:
+    radial-gradient(circle at 12% 8%, var(--c-yellow-soft) 0, transparent 28%),
+    radial-gradient(circle at 88% 6%, var(--c-pink-soft) 0, transparent 26%),
+    radial-gradient(circle at 90% 92%, var(--c-teal-soft) 0, transparent 30%),
+    radial-gradient(circle at 8% 88%, var(--c-purple-soft) 0, transparent 30%);
+  color:var(--ink);
+  font-family:'Nunito',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  font-weight:600;
+  line-height:1.55;
+  min-height:100vh;
+}
+.app{max-width:680px;margin:0 auto;padding:12px 12px 28px;position:relative;}
+
+/* ---------- HEADER ---------- */
+header.top{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  margin-bottom:12px;flex-wrap:wrap;
+}
+.header-left{display:flex;align-items:center;gap:10px;}
+.header-mascot{flex-shrink:0;width:46px;height:46px;}
+header.top h1{
+  font-family:'Fredoka',sans-serif;
+  font-weight:700;font-size:22px;letter-spacing:-0.02em;
+  background:linear-gradient(90deg,var(--c-red),var(--c-orange),var(--c-yellow),var(--c-green),var(--c-blue),var(--c-purple));
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  line-height:1.1;
+}
+header.top .sub{color:var(--muted);font-size:12px;margin-top:1px;font-weight:600;}
+header.top nav{display:flex;gap:6px;flex-wrap:wrap;}
+header.top nav button{
+  background:var(--surface);border:2px solid var(--line);color:var(--ink);
+  padding:7px 13px;border-radius:var(--radius-pill);
+  font-family:'Fredoka',sans-serif;font-size:13px;font-weight:500;
+  cursor:pointer;transition:all 0.15s ease;
+}
+header.top nav button:hover{transform:translateY(-1px);border-color:var(--c-purple);}
+header.top nav button.active{
+  background:var(--c-purple);color:#fff;border-color:var(--c-purple);
+  box-shadow:0 3px 0 #6c3fb8;
+}
+
+/* ---------- PANEL ---------- */
+.panel{
+  background:var(--surface);
+  border:2px solid var(--line);
+  border-radius:var(--radius);
+  padding:14px 15px;
+  box-shadow:var(--shadow);
+  margin-bottom:12px;
+  position:relative;
+}
+.panel h2{
+  font-family:'Fredoka',sans-serif;
+  font-size:17px;font-weight:600;margin-bottom:11px;
+  display:flex;align-items:center;gap:7px;
+}
+.panel h3{
+  font-family:'Fredoka',sans-serif;
+  font-size:14px;font-weight:600;margin:12px 0 7px;
+  color:var(--c-purple);
+  display:flex;align-items:center;gap:6px;
+}
+
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;}
+label.field{
+  display:flex;flex-direction:column;gap:5px;
+  font-family:'Fredoka',sans-serif;font-size:11px;
+  color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;font-weight:500;
+}
+select,input[type=text],input[type=date],input[type=url]{
+  background:var(--bg-paper);
+  border:2px solid var(--line);
+  border-radius:var(--radius-sm);
+  padding:9px 12px;
+  font-size:14px;color:var(--ink);
+  font-family:inherit;font-weight:600;
+}
+select:focus,input:focus{outline:3px solid var(--c-yellow);outline-offset:1px;border-color:var(--c-orange);}
+
+/* ---------- BUTTONS ---------- */
+button.primary{
+  background:var(--c-red);color:#fff;border:none;
+  border-radius:var(--radius-pill);
+  padding:11px 18px;
+  font-family:'Fredoka',sans-serif;font-size:14px;font-weight:600;
+  cursor:pointer;
+  box-shadow:0 4px 0 #b8202c;
+  transition:all 0.1s ease;
+}
+button.primary:hover{transform:translateY(-1px);box-shadow:0 5px 0 #b8202c;}
+button.primary:active{transform:translateY(2px);box-shadow:0 2px 0 #b8202c;}
+button.secondary{
+  background:var(--c-yellow);color:#5a3e00;border:none;
+  border-radius:var(--radius-pill);
+  padding:11px 16px;
+  font-family:'Fredoka',sans-serif;font-size:14px;font-weight:600;
+  cursor:pointer;box-shadow:0 3px 0 #c8970d;
+  transition:all 0.1s ease;
+}
+button.secondary:hover{transform:translateY(-1px);box-shadow:0 4px 0 #c8970d;}
+button.secondary:active{transform:translateY(2px);box-shadow:0 1px 0 #c8970d;}
+button.ghost{
+  background:transparent;color:var(--muted);
+  border:2px dashed var(--line-hi);border-radius:var(--radius-pill);
+  padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;
+  font-family:'Fredoka',sans-serif;
+}
+button.ghost:hover{color:var(--ink);border-color:var(--c-purple);}
+
+/* ---------- PILLS ---------- */
+.pill{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:4px 11px;border-radius:var(--radius-pill);
+  font-family:'Fredoka',sans-serif;
+  font-size:12px;font-weight:500;letter-spacing:0.02em;
+}
+.pill.red    {background:var(--c-red-soft);    color:#9c1f29;}
+.pill.orange {background:var(--c-orange-soft); color:#7a4612;}
+.pill.yellow {background:var(--c-yellow-soft); color:#7a5a00;}
+.pill.green  {background:var(--c-green-soft);  color:#1f6850;}
+.pill.blue   {background:var(--c-blue-soft);   color:#1e4f87;}
+.pill.purple {background:var(--c-purple-soft); color:#5e2da8;}
+.pill.pink   {background:var(--c-pink-soft);   color:#a83464;}
+.pill.teal   {background:var(--c-teal-soft);   color:#1c6781;}
+.pill.muted  {background:var(--bg-paper); color:var(--muted); border:1px solid var(--line);}
+
+/* ---------- WEEKEND BANNER ---------- */
+.weekend-banner{
+  background:linear-gradient(135deg,var(--c-yellow-soft),var(--c-pink-soft));
+  color:#5a3e00;border:2px solid var(--c-orange);
+  padding:14px 16px;border-radius:var(--radius);font-size:14px;font-weight:600;
+  font-family:'Fredoka',sans-serif;
+}
+
+/* ---------- PLAN ---------- */
+.plan h2.theme{
+  font-family:'Fredoka',sans-serif;
+  font-size:21px;font-weight:700;letter-spacing:-0.02em;
+  margin-bottom:4px;line-height:1.15;
+  color:var(--ink);
+}
+.plan .date-line{
+  color:var(--muted);font-size:12px;margin-bottom:11px;font-weight:600;
+}
+.plan .meta{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(102px,1fr));
+  gap:7px 10px;margin-bottom:4px;
+  background:var(--bg-paper);border-radius:var(--radius-sm);
+  padding:10px 12px;border:1px solid var(--line);
+}
+.plan .meta .meta-label{
+  color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;
+  font-family:'Fredoka',sans-serif;font-size:9.5px;font-weight:500;
+}
+.plan .meta .meta-value{
+  color:var(--ink);font-size:13px;font-weight:700;margin-top:1px;line-height:1.25;
+}
+
+.plan .goal{
+  background:linear-gradient(135deg,var(--c-yellow-soft),var(--c-orange-soft));
+  color:#5a3e00;
+  border-radius:var(--radius-sm);padding:10px 13px;font-size:13px;
+  margin:10px 0;border-left:5px solid var(--c-yellow);
+}
+.plan .goal strong{font-family:'Fredoka',sans-serif;font-weight:600;}
+
+.plan .read-aloud{
+  background:var(--c-blue-soft);
+  border-radius:var(--radius-sm);padding:10px 13px;font-size:13px;
+  margin:10px 0;border-left:5px solid var(--c-blue);
+}
+.plan .read-aloud strong{color:#1e4f87;font-family:'Fredoka',sans-serif;font-weight:600;}
+.plan .read-aloud ul{margin:6px 0 0 20px;}
+.plan .read-aloud li{margin-bottom:2px;}
+
+/* ---------- ACTIVITY LIST (flat) ---------- */
+.activities-section{margin-top:10px;}
+.activities-list{display:flex;flex-direction:column;gap:9px;}
+
+.activity-card{
+  position:relative;
+  background:var(--surface);
+  border:2px solid var(--line);
+  border-left:5px solid var(--card-color, var(--c-purple));
+  border-radius:var(--radius-sm);
+  padding:10px 12px;
+  box-shadow:0 2px 0 rgba(42,35,53,0.04);
+}
+.activity-card .activity-num{
+  flex-shrink:0;
+  width:21px;height:21px;border-radius:50%;
+  background:var(--card-color, var(--c-purple));color:#fff;
+  display:inline-flex;align-items:center;justify-content:center;
+  font-family:'Fredoka',sans-serif;font-weight:700;font-size:12px;
+}
+.activity-card .activity-head{
+  display:flex;align-items:center;
+  gap:8px;margin-bottom:5px;
+}
+.activity-card .activity-title{
+  font-family:'Fredoka',sans-serif;
+  font-size:15px;font-weight:600;color:var(--ink);
+  flex:1;min-width:0;line-height:1.25;
+}
+.activity-card .focus-pill{
+  font-family:'Fredoka',sans-serif;
+  font-size:11px;font-weight:600;
+  padding:4px 10px;border-radius:var(--radius-pill);
+  background:var(--card-color, var(--c-purple));color:#fff;
+  flex-shrink:0;
+}
+.activity-card .activity-meta{
+  display:flex;gap:5px;flex-wrap:wrap;
+  font-size:10.5px;color:var(--muted);margin-bottom:7px;
+}
+.activity-card .activity-steps{
+  font-size:13px;color:var(--ink);margin-left:18px;font-weight:600;line-height:1.4;
+}
+.activity-card .activity-steps li{margin-bottom:2px;}
+.activity-card .activity-mat{
+  font-size:12px;color:var(--muted);margin-top:7px;font-weight:600;
+}
+.activity-card .activity-safety{
+  font-size:12px;color:#9c1f29;margin-top:5px;
+  background:var(--c-red-soft);
+  padding:6px 10px;border-radius:var(--radius-sm);font-weight:600;
+}
+
+/* ---------- MATERIALS ---------- */
+.materials-list{display:flex;flex-wrap:wrap;gap:6px;}
+.materials-list .pill{
+  background:var(--bg-paper);border:1px solid var(--line);
+  color:var(--ink);font-size:12px;font-weight:600;padding:4px 10px;
+  font-family:'Nunito',sans-serif;
+}
+
+/* ---------- SPANISH ---------- */
+.spanish-list{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));
+  gap:5px 12px;font-size:13px;
+  background:var(--c-pink-soft);
+  padding:10px 13px;border-radius:var(--radius-sm);
+  border-left:5px solid var(--c-pink);
+}
+.spanish-list .es{color:#a83464;font-weight:700;font-family:'Fredoka',sans-serif;}
+.spanish-list .en{color:var(--muted);}
+
+/* ---------- MILESTONE ---------- */
+.milestone{
+  background:var(--c-green-soft);
+  border-radius:var(--radius-sm);padding:10px 13px;font-size:12.5px;
+  margin:10px 0;color:#1f6850;border-left:5px solid var(--c-green);
+}
+.milestone strong{font-family:'Fredoka',sans-serif;font-weight:600;}
+
+/* ---------- FEEDBACK ---------- */
+.feedback{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+.feedback button{
+  background:#fff;border:2px solid var(--line-hi);
+  border-radius:var(--radius-pill);padding:7px 12px;
+  font-family:'Fredoka',sans-serif;font-size:12px;font-weight:500;
+  cursor:pointer;transition:all 0.1s ease;
+}
+.feedback button:hover{transform:translateY(-1px);}
+.feedback button.selected{
+  background:var(--c-green);color:#fff;border-color:var(--c-green);
+  box-shadow:0 2px 0 #2e7d62;
+}
+
+/* ---------- TOMORROW ---------- */
+.tomorrow{
+  font-size:12.5px;color:var(--ink);
+  background:linear-gradient(135deg,var(--c-purple-soft),var(--c-teal-soft));
+  border-radius:var(--radius-sm);padding:10px 13px;margin-top:10px;
+  border-left:5px solid var(--c-purple);font-weight:600;
+}
+.tomorrow strong{font-family:'Fredoka',sans-serif;color:#5e2da8;}
+
+/* ---------- HISTORY ---------- */
+.history-row{
+  display:grid;grid-template-columns:minmax(0,1.3fr) 1fr auto;gap:8px;
+  padding:10px 0;border-top:1px solid var(--line);font-size:13px;
+}
+.history-row:first-child{border-top:none;}
+.history-row .h-date{color:var(--muted);font-weight:600;}
+.history-row .h-fb{color:var(--c-green);font-size:12px;font-weight:600;}
+
+.footer-help{
+  font-family:'Fredoka',sans-serif;
+  font-size:12px;color:var(--muted);text-align:center;margin-top:16px;font-weight:500;
+  display:flex;justify-content:center;align-items:center;gap:8px;
+}
+.dino-strip{display:flex;justify-content:center;gap:10px;margin:18px 0 6px;opacity:0.6;}
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width:560px){
+  .app{padding:10px 10px 24px;}
+  header.top{gap:8px;}
+  header.top h1{font-size:20px;}
+  header.top nav{width:100%;}
+  header.top nav button{flex:1;text-align:center;}
+  .row{flex-direction:column;align-items:stretch;}
+  .row > *{width:100%;}
+  .plan h2.theme{font-size:19px;}
+  .plan .meta{grid-template-columns:1fr 1fr;}
+}
+@media (max-width:360px){
+  .plan .meta{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+<div id="app" class="app"></div>
+
+<script>
+/* ============================================================
+   Johnny's Homeschool Planner — single-file build.
+   Open this HTML in any modern browser. State persists per
+   browser via localStorage; no server, no internet required.
+   ============================================================ */
+window.HSP = window.HSP || {};
+
+/* ---------- data: johnny ---------- */
+window.HSP.JOHNNY = {
+  name: "Johnny",
+  birthday: "2024-06-14",
+  ageMonthsAt: function (date) {
+    const b = new Date(this.birthday);
+    const d = new Date(date);
+    return (d.getFullYear() - b.getFullYear()) * 12
+      + (d.getMonth() - b.getMonth())
+      - (d.getDate() < b.getDate() ? 1 : 0);
+  }
+};
+
+/* ---------- data: curriculum ---------- */
+window.HSP.CURRICULUM = {
+  startAnchor: { date: "2026-05-04", unit: 6, week: 2, day: 1 },
+  dayOfWeekSkills: {
+    1: { label: "Predicting & Sorting",       primary: "predicting",     secondary: "sorting" },
+    2: { label: "Letter Naming & Numbers",    primary: "alphabet",       secondary: "numbers" },
+    3: { label: "Predicting & Measuring",     primary: "predicting",     secondary: "measuring" },
+    4: { label: "Letter Naming & Numbers",    primary: "alphabet",       secondary: "numbers" },
+    5: { label: "Recall & Retell, Shapes",    primary: "recall_retell",  secondary: "shapes" }
+  },
+  units: [
+    { n: 1,  name: "Apples",                   letters: ["Aa"] },
+    { n: 2,  name: "Colors",                   letters: ["Rr"] },
+    { n: 3,  name: "Nursery Rhymes",           letters: ["Nn"] },
+    { n: 4,  name: "Clothing",                 letters: ["Cc", "Jj"] },
+    { n: 5,  name: "Food",                     letters: ["Mm"] },
+    { n: 6,  name: "Five Senses",              letters: ["Ss"] },
+    { n: 7,  name: "Teddy Bears",              letters: ["Bb"] },
+    { n: 8,  name: "Things That Go Together",  letters: ["Qq", "Uu"] },
+    { n: 9,  name: "Community Helpers",        letters: ["Hh"] },
+    { n: 10, name: "Transportation",           letters: ["Tt"] },
+    { n: 11, name: "On the Farm",              letters: ["Kk"] },
+    { n: 12, name: "Weather",                  letters: ["Ff"] },
+    { n: 13, name: "Eggs",                     letters: ["Ww", "Ee"] },
+    { n: 14, name: "Plants",                   letters: ["Pp", "Ll"] },
+    { n: 15, name: "Construction",             letters: ["Yy", "Zz"] },
+    { n: 16, name: "Pets",                     letters: ["Dd"] },
+    { n: 17, name: "Opposites",                letters: ["Oo", "Xx"] },
+    { n: 18, name: "Fairy Tales & Folk Tales", letters: ["Gg", "Vv"] },
+    { n: 19, name: "Water",                    letters: ["Ii"] }
+  ],
+  /* Day theme names describe the day's FOCUS (sense, skill, letter). They do
+     NOT promise specific curriculum activities — the planner adapts the
+     curriculum's framework to toddler-friendly activities from its own bank. */
+  daySubThemes: {
+    "6-1-1": { theme: "Five senses — let's start" },
+    "6-1-2": { theme: "Letter Ss — meet the new letter" },
+    "6-1-3": { theme: "Senses every day" },
+    "6-1-4": { theme: "Letter Ss — practice + numbers" },
+    "6-1-5": { theme: "Sight day + shapes",                senseFocus: "sight" },
+    "6-2-1": { theme: "Hearing day — listen and notice",   senseFocus: "hearing" },
+    "6-2-2": { theme: "Letter Ss + I-spy numbers",         senseFocus: "sight" },
+    "6-2-3": { theme: "Smell day — sniff and name",        senseFocus: "smell" },
+    "6-2-4": { theme: "Touch day — feel and describe",     senseFocus: "touch" },
+    "6-2-5": { theme: "Recap the five senses + shapes" },
+    "7-1-1": { theme: "Teddy bears — meet our friends" },
+    "7-1-2": { theme: "Letter Bb + counting bears" },
+    "7-1-3": { theme: "Bear sizes — big & small" },
+    "7-1-4": { theme: "Letter Bb + bear numbers" },
+    "7-1-5": { theme: "Bear stories — recall + shapes" },
+    "7-2-1": { theme: "Bears — sorting day" },
+    "7-2-2": { theme: "Letter Bb — review" },
+    "7-2-3": { theme: "Bear measurements" },
+    "7-2-4": { theme: "Letter Bb — bear count" },
+    "7-2-5": { theme: "Teddy bear picnic — recall" }
+  },
+  unitGuidingQuestion: {
+    6: "What are our five senses, and how do we use them?",
+    7: "What is a teddy bear, and how can teddy bears help us learn?"
+  },
+  /* Activity tags each unit's play should lean toward. Drives activity
+     selection so the plan reflects the CURRENT unit, not a past one.
+     Sense tags (smell/taste/etc.) only belong to the units that list them,
+     so they don't leak forward into later units like "Things That Go Together". */
+  unitFocusTags: {
+    1:  ["sorting","colors","taste"],
+    2:  ["colors","sorting","sight"],
+    3:  ["language","music","pretend","read_aloud"],
+    4:  ["sorting","matching","household"],
+    5:  ["taste","sorting","household"],
+    6:  ["smell","taste","touch","hearing","sight"],
+    7:  ["pretend","sorting","measuring"],
+    8:  ["matching","sorting"],
+    9:  ["pretend","language","follow_directions"],
+    10: ["movement","pretend","sound"],
+    11: ["pretend","sound","language"],
+    12: ["sight","language","outdoor"],
+    13: ["sorting","fine_motor"],
+    14: ["outdoor","sensory","exploration"],
+    15: ["fine_motor","problem_solving","numbers"],
+    16: ["pretend","language","sound"],
+    17: ["sorting","matching","vocabulary"],
+    18: ["language","pretend","read_aloud"],
+    19: ["sensory","touch","measuring"]
+  },
+  locationForDate: function (date, dateUtils) {
+    const anchor = this.startAnchor;
+    const offset = dateUtils.weekdaysBetween(anchor.date, date);
+    const anchorIndex = (anchor.unit - 1) * 10 + (anchor.week - 1) * 5 + (anchor.day - 1);
+    const totalIndex = anchorIndex + offset;
+    if (totalIndex < 0) return null;
+    const unitNum = Math.floor(totalIndex / 10) + 1;
+    const week = Math.floor((totalIndex % 10) / 5) + 1;
+    const day = (totalIndex % 5) + 1;
+    if (unitNum > this.units.length) return { unit: null, week, day, beyondCurriculum: true };
+    const unit = this.units[unitNum - 1];
+    const key = unit.n + "-" + week + "-" + day;
+    const sub = this.daySubThemes[key] || null;
+    return { unit, week, day, sub, key };
+  }
+};
+
+/* ---------- data: caregivers ---------- */
+window.HSP.CAREGIVERS = {
+  mama:           { id: "mama",            label: "Mama",              mode: "full"     },
+  dada:           { id: "dada",            label: "Dada",              mode: "full"     },
+  mama_dada:      { id: "mama_dada",       label: "Mama & Dada",       mode: "full"     },
+  nana:           { id: "nana",            label: "Nana",              mode: "spanish"  },
+  papa:           { id: "papa",            label: "Papa",              mode: "spanish"  },
+  nana_papa:      { id: "nana_papa",       label: "Nana & Papa",       mode: "spanish"  },
+  grandma:        { id: "grandma",         label: "Grandma",           mode: "low_prep" },
+  grandpa:        { id: "grandpa",         label: "Grandpa",           mode: "low_prep" },
+  grandma_grandpa:{ id: "grandma_grandpa", label: "Grandma & Grandpa", mode: "low_prep" }
+};
+window.HSP.CAREGIVER_MODES = {
+  full: {
+    id: "full", label: "Full plan",
+    activitiesCount: 6,
+    allowMessy: true,
+    spanishExposure: "light",
+    includeReadAloud: true, adultInvolvement: "high"
+  },
+  spanish: {
+    id: "spanish", label: "Conversational + Spanish exposure",
+    activitiesCount: 4,
+    allowMessy: false,
+    spanishExposure: "rich",
+    includeReadAloud: true, adultInvolvement: "medium"
+  },
+  low_prep: {
+    id: "low_prep", label: "Low-prep + find-it games",
+    activitiesCount: 3,
+    allowMessy: false,
+    spanishExposure: "none",
+    includeReadAloud: false, adultInvolvement: "low"
+  }
+};
+
+/* ---------- data: spanish ---------- */
+window.HSP.SPANISH = {
+  general_body: [
+    { en: "head", es: "cabeza" },{ en: "hair", es: "pelo" },
+    { en: "eyes", es: "ojos" },{ en: "nose", es: "nariz" },
+    { en: "ears", es: "orejas" },{ en: "mouth", es: "boca" },
+    { en: "hand", es: "mano" },{ en: "feet", es: "pies" },
+    { en: "tummy", es: "panza" }
+  ],
+  general_action: [
+    { en: "look", es: "mira" },{ en: "listen", es: "escucha" },
+    { en: "touch", es: "toca" },{ en: "smell", es: "huele" },
+    { en: "taste", es: "prueba" },{ en: "come here", es: "ven" },
+    { en: "let's go", es: "vamos" },{ en: "open", es: "abre" },
+    { en: "close", es: "cierra" }
+  ],
+  general_courtesy: [
+    { en: "please", es: "por favor" },{ en: "thank you", es: "gracias" },
+    { en: "yes", es: "sí" },{ en: "no", es: "no" },
+    { en: "more", es: "más" },{ en: "all done", es: "ya terminé" }
+  ],
+  five_senses: [
+    { en: "sweet", es: "dulce" },{ en: "sour", es: "agrio" },
+    { en: "salty", es: "salado" },{ en: "soft", es: "suave" },
+    { en: "rough", es: "áspero" },{ en: "loud", es: "fuerte" },
+    { en: "quiet", es: "silencioso" },{ en: "smells good", es: "huele rico" },
+    { en: "I see", es: "yo veo" },{ en: "I hear", es: "yo oigo" },
+    { en: "I touch", es: "yo toco" },{ en: "I smell", es: "yo huelo" },
+    { en: "I taste", es: "yo pruebo" }
+  ],
+  teddy_bears: [
+    { en: "bear", es: "oso" },{ en: "soft", es: "suave" },
+    { en: "hug", es: "abrazo" },{ en: "sleep", es: "dormir" }
+  ],
+  food: [
+    { en: "apple", es: "manzana" },{ en: "milk", es: "leche" },
+    { en: "water", es: "agua" },{ en: "bread", es: "pan" },
+    { en: "cheese", es: "queso" },{ en: "egg", es: "huevo" }
+  ],
+  colors: [
+    { en: "red", es: "rojo" },{ en: "blue", es: "azul" },
+    { en: "yellow", es: "amarillo" },{ en: "green", es: "verde" },
+    { en: "orange", es: "naranja" },{ en: "purple", es: "morado" }
+  ],
+  numbers_1_10: [
+    { en: "one", es: "uno" },{ en: "two", es: "dos" },
+    { en: "three", es: "tres" },{ en: "four", es: "cuatro" },
+    { en: "five", es: "cinco" },{ en: "six", es: "seis" },
+    { en: "seven", es: "siete" },{ en: "eight", es: "ocho" },
+    { en: "nine", es: "nueve" },{ en: "ten", es: "diez" }
+  ],
+  setForDay: function (unitName, dayThemeKeyword, take) {
+    const buckets = [this.general_action, this.general_courtesy];
+    const u = (unitName || "").toLowerCase();
+    if (u.includes("five senses")) buckets.push(this.five_senses);
+    if (u.includes("teddy")) buckets.push(this.teddy_bears);
+    if (u.includes("food")) buckets.push(this.food);
+    if (u.includes("colors")) buckets.push(this.colors);
+    if ((dayThemeKeyword || "").toLowerCase().includes("number")) buckets.push(this.numbers_1_10);
+    buckets.push(this.general_body);
+    const flat = [].concat.apply([], buckets);
+    const seen = {};
+    const dedup = flat.filter(w => (seen[w.en] ? false : (seen[w.en] = true)));
+    return dedup.slice(0, take || 6);
+  }
+};
+
+/* ---------- data: pathways ---------- */
+window.HSP.PATHWAYS = {
+  ageRange: "19-24 months",
+  milestoneAreas: [
+    { id: "language_imitation", area: "Language", milestone: "Imitates new words and short phrases.",
+      activities: ["Repeat one new word together five times today.","Say a short phrase ('big truck!') and pause for him to echo.","Sing a familiar song and leave the last word for him to fill in."] },
+    { id: "follow_directions", area: "Language", milestone: "Follows simple one-step directions.",
+      activities: ["Try one direction at a time: 'Bring me your shoe.'","Make it playful: 'Can you stomp like a dinosaur?'","Try a 2-part direction only if the first goes well."] },
+    { id: "body_parts", area: "Language", milestone: "Identifies several body parts when named.",
+      activities: ["Touch and name 3-5 body parts during a diaper change or bath.","Sing 'Head, shoulders, knees, and toes' slowly.","Ask 'Where is your nose?' during play and praise the touch."] },
+    { id: "movement_balance", area: "Gross motor", milestone: "Walks well, squats to pick up toys, climbs on furniture.",
+      activities: ["Set up a pillow obstacle course on the floor.","Walk along a line of painter's tape on the floor.","Squat-and-stand game: drop toys into a bucket."] },
+    { id: "ball_play", area: "Gross motor", milestone: "Rolls, throws, and chases a ball.",
+      activities: ["Sit across the room and roll a ball back and forth.","Toss a soft ball into a laundry basket.","Chase a ball outside or down a hallway."] },
+    { id: "fine_motor", area: "Fine motor", milestone: "Stacks blocks, scribbles, turns pages, uses a pincer grasp.",
+      activities: ["Stack 3-4 blocks and let him knock them down.","Drop pom-poms or cereal pieces into a small jar.","Hand him a chunky crayon and a big sheet of paper."] },
+    { id: "sensory_exploration", area: "Sensory", milestone: "Explores textures, temperatures, and weights with hands.",
+      activities: ["Fill a shallow bin with dry rice and a few hidden toys.","Compare 'cold water' and 'warm water' in two bowls.","Pass around three textures: smooth, rough, soft."] },
+    { id: "pretend_play", area: "Cognitive / play", milestone: "Beginning pretend play — feeding a doll, talking on a phone.",
+      activities: ["Pretend to feed a stuffed animal a snack.","Use a banana as a phone and have a 'call'.","Cover a toy with a blanket: 'Night-night!'"] },
+    { id: "problem_solving", area: "Cognitive", milestone: "Tries multiple steps to solve simple problems.",
+      activities: ["Hide a favorite toy under one of two cups and let him find it.","Offer shape sorter or stacking rings.","Show him how to fit a lid on a container, then let him try."] },
+    { id: "outdoor_exploration", area: "Sensory + gross motor", milestone: "Notices and points to things outdoors; explores nature.",
+      activities: ["Take a slow walk and stop to look at three things.","Pick up a leaf and a stick and compare them.","Listen for 3 outdoor sounds and name them."] }
+  ],
+  pickForDay: function (skillFocus, senseFocus, rng) {
+    const map = {
+      sorting: ["sensory_exploration","fine_motor","problem_solving"],
+      predicting: ["language_imitation","follow_directions"],
+      measuring: ["movement_balance","fine_motor"],
+      alphabet: ["language_imitation","follow_directions"],
+      numbers: ["fine_motor","follow_directions"],
+      shapes: ["problem_solving","fine_motor"],
+      recall_retell: ["language_imitation","body_parts"]
+    };
+    const senseMap = {
+      hearing: ["language_imitation","outdoor_exploration"],
+      sight: ["follow_directions","outdoor_exploration"],
+      smell: ["sensory_exploration"],
+      touch: ["sensory_exploration","fine_motor"],
+      taste: ["sensory_exploration"]
+    };
+    const candidates = (senseMap[senseFocus] || []).concat(map[skillFocus] || []);
+    const ids = candidates.length ? candidates : ["movement_balance","language_imitation"];
+    const id = rng.pick(ids);
+    return this.milestoneAreas.find(m => m.id === id);
+  }
+};
+
+/* ---------- data: activities ---------- */
+window.HSP.ACTIVITIES = [
+  { id:"sens_rice_hide", title:"Rice bin hide-and-find", kind:"sensory", minutes:8, prep:"low", mess:"medium", supervision:"high",
+    tags:["sensory","fine_motor","touch","find_it","sorting"], modes:["full"], repeatable:true,
+    materials:["shallow bin","uncooked rice","5–8 small toys"],
+    steps:["Bury 5–8 small toys in a shallow bin of dry rice.","Sit beside Johnny and let him dig and discover.","Name each toy as he finds it. Stop when he's done."],
+    safety:"Stay seated next to him — rice is a choking hazard." },
+  { id:"sens_texture_tray", title:"Three-texture touch tray", kind:"sensory", minutes:5, prep:"low", mess:"none", supervision:"medium",
+    tags:["sensory","touch","language","vocabulary"], modes:["full","spanish","low_prep"], repeatable:true,
+    materials:["a soft cloth","a rough sponge or sandpaper","a smooth spoon"],
+    steps:["Lay three textures on a tray.","Touch each one and say the word: soft, rough, smooth.","Ask Johnny to find the soft one, then the rough one."],
+    safety:"Watch sandpaper near eyes/mouth." },
+  { id:"sens_smell_jars", title:"Two-cup smell test", kind:"sensory", minutes:4, prep:"low", mess:"none", supervision:"high",
+    tags:["sensory","smell","vocabulary"], modes:["full","spanish","low_prep"], repeatable:true,
+    materials:["2 small cups","a slice of lemon or orange peel","a pinch of cinnamon"],
+    steps:["Put one scent in each cup.","Smell together: 'Mmm! What do you smell?'","Name the scents and pick a favorite."],
+    safety:"Hold cups yourself; do not let him drink contents." },
+  { id:"sens_warm_cool_water", title:"Warm and cool water bowls", kind:"sensory", minutes:6, prep:"low", mess:"low", supervision:"high",
+    tags:["sensory","touch","measuring","vocabulary"], modes:["full"], repeatable:true,
+    materials:["2 bowls","warm water (not hot)","cool water"],
+    steps:["Fill two bowls — one warm, one cool.","Dip a finger in each and name it: 'warm', 'cool'.","Let him swap fingers between bowls."],
+    safety:"Test water temp on your wrist first. No deep water near toddlers." },
+  { id:"sens_pompom_sort", title:"Pom-pom color sort", kind:"sensory", minutes:7, prep:"low", mess:"none", supervision:"medium",
+    tags:["sensory","sorting","fine_motor","colors","sight"], modes:["full"], repeatable:true,
+    materials:["pom-poms in 3-4 colors","a muffin tin or 4 cups"],
+    steps:["Mix the pom-poms in a pile.","Show him: 'Red goes here, blue goes here.'","Let him sort. Cheer the matches; redirect mistakes gently."],
+    safety:"Pom-poms are a choking hazard — stay close." },
+  { id:"sens_taste_two", title:"Two-flavor taste test", kind:"sensory", minutes:5, prep:"low", mess:"low", supervision:"high",
+    tags:["sensory","taste","vocabulary"], modes:["full","spanish","low_prep"], repeatable:true,
+    materials:["a small piece of apple (sweet)","a small piece of plain cracker (salty)"],
+    steps:["Offer one bite at a time.","Name it: 'sweet apple', 'salty cracker'.","Ask 'More? Or all done?'"],
+    safety:"Cut food small. Watch every bite." },
+  { id:"sens_mystery_box", title:"Mystery touch box", kind:"sensory", minutes:6, prep:"low", mess:"none", supervision:"high",
+    tags:["sensory","touch","language"], modes:["full","spanish","low_prep"], repeatable:true,
+    materials:["empty tissue box","5 familiar toys"],
+    steps:["Put 5 familiar toys inside a tissue box.","Have him reach in (no peeking) and pull one out.","Before he reveals it, ask 'What does it feel like?'"],
+    safety:"Ensure no sharp items are inside." },
+  { id:"sens_sound_bottles", title:"Shake-and-listen bottles", kind:"sensory", minutes:5, prep:"medium", mess:"none", supervision:"medium",
+    tags:["sensory","hearing","sound","fine_motor"], modes:["full"], repeatable:true,
+    materials:["2-3 small sealed containers","rice, beans, a coin"],
+    steps:["Pre-fill containers with different items, sealed shut.","Shake each and listen together.","Say 'loud' and 'quiet' as he shakes each one."],
+    safety:"Tape lids tight. Always supervise." },
+  /* --- Additional SMELL activities --- */
+  { id:"sens_smell_walk", title:"Smell-it walk around home", kind:"sensory", minutes:6, prep:"none", mess:"none", supervision:"high",
+    tags:["sensory","smell","language","find_it","vocabulary"], modes:["full","spanish","low_prep"], repeatable:true,
+    materials:[],
+    steps:["Walk slowly through the kitchen, the bathroom, and outside.","Stop 3 times to sniff: 'What do you smell?'","Name each smell out loud — soap, flower, food, leaves."],
+    safety:"Do NOT sniff cleaning products or chemicals. Stay close at the stove." },
+  { id:"sens_smell_match", title:"Match-the-scent cups", kind:"sensory", minutes:6, prep:"medium", mess:"none", supervision:"high",
+    tags:["sensory","smell","sorting","matching","fine_motor"], modes:["full"], repeatable:true,
+    materials:["4 small cups","2 cotton balls with a pinch of cinnamon","2 cotton balls with lemon peel"],
+    steps:["Put one cotton ball in each cup. Two cups smell the same.","Sniff each cup together. 'Find the two that match!'","Pair them up. Cheer the matches."],
+    safety:"Hold cups so he can't drink contents. No essential oils." },
+  { id:"lang_smell_words", title:"Smell words: yummy or stinky?", kind:"language", minutes:4, prep:"none", mess:"none", supervision:"medium",
+    tags:["language","smell","vocabulary","sorting"], modes:["full","spanish","low_prep"], repeatable:true,
+    materials:["a piece of fruit","a flower or herb","a clean sock"],
+    steps:["Sniff each item together: an apple, a flower, a sock.","For each ask: 'Yummy? Or stinky?'","Repeat the words: yummy, stinky, sweet, fresh."],
+    safety:"Use only safe-to-sniff items." },
+  { id:"lang_smell_outdoor", title:"Outdoor smell hunt", kind:"language", minutes:6, prep:"none", mess:"none", supervision:"high",
+    tags:["language","smell","outdoor","find_it","vocabulary"], modes:["full","spanish","low_prep"], repeatable:true,
+    materials:["shoes"],
+    steps:["Walk outside together: 'Let's find smells!'","Stop at a flower, the grass, a leaf — sniff each one.","Name what you smell: fresh, sweet, green, dirt."],
+    safety:"Hold his hand. Don't sniff anything you can't identify." },
+  { id:"lang_smell_kitchen", title:"Kitchen smell tour", kind:"language", minutes:5, prep:"none", mess:"none", supervision:"high",
+    tags:["language","smell","household","vocabulary","find_it"], modes:["full","spanish","low_prep"], repeatable:true,
+    materials:["spices, fruit, or bread from your kitchen"],
+    steps:["Open one cabinet at a time and sniff together.","Smell a banana, a slice of bread, an open spice jar (cinnamon, vanilla).","Name each: 'sweet, warm, fruity.'"],
+    safety:"Hold spice jars yourself. Skip strong spices like pepper." },
+  /* --- Additional TASTE activities --- */
+  { id:"sens_taste_three", title:"Three-flavor taste test", kind:"sensory", minutes:6, prep:"low", mess:"low", supervision:"high",
+    tags:["sensory","taste","vocabulary","sorting"], modes:["full"], repeatable:true,
+    materials:["small piece of apple","small piece of cracker","small wedge of lemon"],
+    steps:["Offer one bite at a time. Name each: sweet, salty, sour.","Watch his face — sour gets the best reactions.","Ask 'Which one again?' Let him point."],
+    safety:"Cut food small. Stay arm's-length. Skip lemon if it upsets him." },
+  { id:"lang_taste_words", title:"Taste words at snack time", kind:"language", minutes:5, prep:"none", mess:"none", supervision:"high",
+    tags:["language","taste","vocabulary"], modes:["full","spanish","low_prep"], repeatable:true,
+    materials:["whatever he's snacking on"],
+    steps:["At snack time, ask: 'What does it taste like?'","Name flavors: 'sweet, crunchy, soft, salty.'","Repeat his words back and add one new word."],
+    safety:"Standard mealtime supervision." },
+  { id:"lang_taste_kitchen", title:"Cold, warm, crunchy snack talk", kind:"language", minutes:5, prep:"none", mess:"low", supervision:"high",
+    tags:["language","taste","household","vocabulary"], modes:["full","spanish","low_prep"], repeatable:true,
+    materials:["a cold piece of fruit, a warm piece of toast (or cracker), a crunchy snack"],
+    steps:["Offer each item one at a time.","Name the texture and temperature: 'cold, warm, crunchy.'","Ask 'Which is your favorite?' Let him point."],
+    safety:"Cut food small. Test temperature first." },
+  /* --- Additional HEARING activities --- */
+  { id:"sens_drum_tap", title:"Drum and tap — loud and quiet", kind:"sensory", minutes:5, prep:"none", mess:"none", supervision:"low",
+    tags:["sensory","hearing","sound","music","movement"], modes:["full","spanish","low_prep"], repeatable:true,
+    materials:["a pot, lid, or table","a wooden spoon"],
+    steps:["Tap softly together: say 'quiet'.","Bang loudly: 'LOUD!'","Take turns leading. Try fast and slow."],
+    safety:"Avoid hard surfaces near his face. Cover ears if it gets too loud." },
+  { id:"lang_animal_sounds", title:"Animal sound match", kind:"language", minutes:4, prep:"none", mess:"none", supervision:"low",
+    tags:["language","hearing","sound","vocabulary","pretend"], modes:["full","spanish","low_prep"], repeatable:true,
+    materials:["3-4 toy animals or animal pictures"],
+    steps:["Hold up one animal: 'What does the cow say?'","Make the sound together. Try 4 animals.","Switch: you make the sound, he points to the animal."],
+    safety:"None." },
+  /* --- Additional SIGHT activities --- */
+  { id:"sens_color_hunt", title:"Color hunt around the room", kind:"sensory", minutes:5, prep:"none", mess:"none", supervision:"low",
+    tags:["sensory","sight","colors","find_it","language","sorting"], modes:["full","spanish","low_prep"], repeatable:true,
+    materials:[],
+    steps:["Pick a color. 'Show me something RED!'","He brings a red item; you cheer.","Try 3-4 different colors."],
+    safety:"None." },
+  { id:"lang_iSpy", title:"I-Spy with my little eye", kind:"language", minutes:4, prep:"none", mess:"none", supervision:"low",
+    tags:["language","sight","find_it","predicting","vocabulary"], modes:["full","spanish","low_prep"], repeatable:true,
+    materials:[],
+    steps:["Sit somewhere with lots to look at.","'I spy with my little eye, something BLUE!'","Help him point. Take turns guessing."],
+    safety:"None." },
+  /* --- Additional TOUCH activities --- */
+  { id:"sens_soft_hard_sort", title:"Soft and hard sort", kind:"sensory", minutes:5, prep:"low", mess:"none", supervision:"medium",
+    tags:["sensory","touch","sorting","vocabulary"], modes:["full","spanish","low_prep"], repeatable:true,
+    materials:["3 soft items (cotton, plush, sock)","3 hard items (block, spoon, toy car)"],
+    steps:["Touch each item together; name 'soft' or 'hard'.","Mix them up. 'Find the soft ones!'","Sort into two piles."],
+    safety:"None." },
+  { id:"lang_touch_words", title:"Soft, rough, smooth talk", kind:"language", minutes:4, prep:"none", mess:"none", supervision:"low",
+    tags:["language","touch","vocabulary"], modes:["full","spanish","low_prep"], repeatable:true,
+    materials:[],
+    steps:["Walk around and touch 4-5 things together.","Name each: 'a soft pillow, a rough rug, a smooth table.'","Ask 'Which one feels best?'"],
+    safety:"Skip anything sharp or hot." },
+  { id:"move_pillow_path", title:"Pillow path walk", kind:"movement", minutes:6, prep:"low", mess:"none", supervision:"medium",
+    tags:["movement","balance","gross_motor","measuring"], modes:["full","spanish","low_prep"], repeatable:true,
+    materials:["3-5 pillows or couch cushions"],
+    steps:["Lay pillows in a line on the floor.","Hold his hand and walk along the squishy path.","Try jumping off the last pillow."],
+    safety:"Clear the area of hard furniture corners." },
+  { id:"move_tape_line", title:"Tape line walk", kind:"movement", minutes:4, prep:"low", mess:"none", supervision:"low",
+    tags:["movement","balance","gross_motor"], modes:["full","spanish","low_prep"], repeatable:true,
+    materials:["painter's tape"],
+    steps:["Stick a long line of tape on the floor.","Walk along it like a balance beam.","Try walking backward as a challenge."],
+    safety:"Smooth, slip-free floor only." },
+  { id:"move_freeze_dance", title:"Freeze dance", kind:"movement", minutes:5, prep:"none", mess:"none", supervision:"low",
+    tags:["movement","music","gross_motor","language"], modes:["full","spanish","low_prep"], repeatable:true,
+    materials:["any music"],
+    steps:["Put on music and dance.","Stop the music and yell 'Freeze!'","Resume. Repeat 4-5 times."],
+    safety:"Make space — clear the rug." },
+  { id:"move_ball_roll", title:"Sit-and-roll ball", kind:"movement", minutes:5, prep:"none", mess:"none", supervision:"low",
+    tags:["movement","ball_play","gross_motor","language","numbers"], modes:["full","spanish","low_prep"], repeatable:true,
+    materials:["any soft ball"],
+    steps:["Sit on the floor across from each other, legs spread.","Roll the ball back and forth.","Count rolls together: 1, 2, 3..."],
+    safety:"Use a light, soft ball indoors." },
+  { id:"move_basket_toss", title:"Basket toss", kind:"movement", minutes:5, prep:"low", mess:"none", supervision:"low",
+    tags:["movement","ball_play","fine_motor","numbers"], modes:["full","spanish","low_prep"], repeatable:true,
+    materials:["laundry basket","soft balls or rolled socks"],
+    steps:["Set the basket a few feet away.","Toss soft balls in. Count each one that lands inside.","Move closer if it's too hard."],
+    safety:"Use only soft items; nothing hard." },
+  { id:"move_animal_walks", title:"Animal walk parade", kind:"movement", minutes:5, prep:"none", mess:"none", supervision:"low",
+    tags:["movement","pretend","language","gross_motor"], modes:["full","spanish","low_prep"], repeatable:true,
+    materials:[],
+    steps:["Pick three animals: bear, frog, duck (or his favorite dinos if he's pulling them out).","Walk like each one across the room — stomp, hop, waddle.","Add a sound for each."],
+    safety:"Carpeted area is best." },
+  { id:"move_outdoor_walk", title:"Slow outdoor walk", kind:"movement", minutes:10, prep:"none", mess:"none", supervision:"high",
+    tags:["outdoor","movement","language","exploration"], modes:["full","spanish","low_prep"], repeatable:true,
+    materials:["shoes"],
+    steps:["Walk slowly down the block or yard.","Stop 3 times to point and name what you see.","Pick up one leaf or stick to bring home."],
+    safety:"Hold his hand near streets. Watch for cars." },
+  { id:"lang_picture_walk", title:"Book picture walk", kind:"language", minutes:6, prep:"none", mess:"none", supervision:"low",
+    tags:["language","predicting","books","read_aloud"], modes:["full","spanish"], repeatable:true,
+    materials:["any picture book"],
+    steps:["Sit together and flip through, pictures only.","Ask 'What's that? What do you see?' on each page.","Read it for real on a second pass."],
+    safety:"Calm seated activity; nothing to flag." },
+  { id:"lang_find_it_house", title:"Find-it around the house", kind:"language", minutes:6, prep:"none", mess:"none", supervision:"low",
+    tags:["language","find_it","vocabulary","movement"], modes:["full","spanish","low_prep"], repeatable:true,
+    materials:[],
+    steps:["Pick a category: something soft, something blue, something round.","Walk around the house finding examples.","Bring 3-5 items to a basket together."],
+    safety:"Tell him which rooms are off-limits." },
+  { id:"lang_body_parts", title:"Body parts touch-and-name", kind:"language", minutes:4, prep:"none", mess:"none", supervision:"low",
+    tags:["language","body_parts","vocabulary"], modes:["full","spanish","low_prep"], repeatable:true,
+    materials:[],
+    steps:["Touch and name 5 parts: nose, eyes, ears, hand, foot.","Ask 'Where is your nose?' and let him touch.","Sing 'Head, shoulders, knees, and toes' once."],
+    safety:"None." },
+  { id:"lang_one_step_directions", title:"Silly one-step directions", kind:"language", minutes:4, prep:"none", mess:"none", supervision:"low",
+    tags:["language","follow_directions","movement"], modes:["full","spanish","low_prep"], repeatable:true,
+    materials:[],
+    steps:["Give one direction at a time: 'Stomp your feet!'","Add silly ones: 'Pat your head!' 'Find a pillow!'","Cheer when he follows; skip if he doesn't."],
+    safety:"Avoid directions involving climbing." },
+  { id:"lang_show_me", title:"'Show me ___' game", kind:"language", minutes:4, prep:"none", mess:"none", supervision:"low",
+    tags:["language","vocabulary","find_it"], modes:["spanish","low_prep","full"], repeatable:true,
+    materials:[],
+    steps:["Sit together and say 'Show me the dog' (a stuffed animal).","He points or brings it. Cheer.","Try 5 different items."],
+    safety:"None." },
+  { id:"lang_listening_walk", title:"Listening walk", kind:"language", minutes:7, prep:"none", mess:"none", supervision:"high",
+    tags:["language","hearing","outdoor","vocabulary"], modes:["full","spanish","low_prep"], repeatable:true,
+    materials:["shoes"],
+    steps:["Walk outside and stop. 'Shh — what do you hear?'","Try to hear 3 sounds: bird, car, leaves.","Talk about each sound back inside."],
+    safety:"Hold his hand. Watch traffic." },
+  { id:"lang_what_do_you", title:"'What do you ___?' senses talk", kind:"language", minutes:5, prep:"none", mess:"none", supervision:"low",
+    tags:["language","senses","vocabulary"], modes:["spanish","full"], repeatable:true,
+    materials:[],
+    steps:["Sit together and ask: 'What do you see right now?'","Continue: 'What do you hear? Smell? Feel?'","Repeat his answers and add one new word."],
+    safety:"None." },
+  { id:"fine_block_stack", title:"Stack-and-knock blocks", kind:"fine_motor", minutes:5, prep:"none", mess:"none", supervision:"low",
+    tags:["fine_motor","numbers","problem_solving"], modes:["full","spanish","low_prep"], repeatable:true,
+    materials:["4-6 blocks"],
+    steps:["Stack 3 blocks. Count them: 1, 2, 3.","Let him knock the tower down.","Repeat with one more block each time."],
+    safety:"Soft blocks are best for indoor play." },
+  { id:"fine_pompom_drop", title:"Pom-pom drop into a jar", kind:"fine_motor", minutes:5, prep:"low", mess:"none", supervision:"high",
+    tags:["fine_motor","numbers","sorting"], modes:["full"], repeatable:true,
+    materials:["small jar with narrow opening","pom-poms"],
+    steps:["Hand pom-poms one at a time.","He drops each into the jar — count to 10.","Pour them out and start again."],
+    safety:"Choking hazard — stay close. Stop if he tries to mouth them." },
+  { id:"fine_chunky_crayons", title:"Big paper, chunky crayons", kind:"coloring", minutes:5, prep:"low", mess:"low", supervision:"low",
+    tags:["coloring","fine_motor"], modes:["full","spanish"], repeatable:true,
+    materials:["chunky/toddler crayons","large paper"],
+    steps:["Tape paper to the table or floor.","Hand him one crayon at a time.","Stop whenever he loses interest — no expectations."],
+    safety:"Watch for crayons heading to the mouth." },
+  { id:"num_count_steps", title:"Count the steps", kind:"numbers", minutes:3, prep:"none", mess:"none", supervision:"low",
+    tags:["numbers","movement","language"], modes:["full","spanish","low_prep"], repeatable:true,
+    materials:[],
+    steps:["Walk somewhere together: 'Let's count our steps!'","Say 1, 2, 3... up to 10.","Try counting hops or claps next."],
+    safety:"None." },
+  { id:"num_card_match", title:"Number card match", kind:"numbers", minutes:5, prep:"low", mess:"none", supervision:"low",
+    tags:["numbers","matching","sorting"], modes:["full"], repeatable:true,
+    materials:["playing cards 2-10"],
+    steps:["Lay down one of each: 2, 3, 4, 5.","Hand him another card and ask 'Where does this go?'","Match a few. Stop when he's done."],
+    safety:"None." },
+  { id:"let_letter_hunt", title:"Letter {LETTER} hunt", kind:"alphabet", minutes:5, prep:"low", mess:"none", supervision:"low",
+    tags:["alphabet","find_it","language"], modes:["full","spanish"], repeatable:true,
+    materials:["sticky note with the letter {LETTER} on it"],
+    steps:["Show the letter on a sticky note: 'This is {LETTER}! It says {LETTER_LOWER}-{LETTER_LOWER}-{LETTER_LOWER} like {CREATURE}.'","Look around for things that start with that sound.","Stick the note on one matching item."],
+    safety:"None." },
+  { id:"let_letter_creature", title:"Letter {LETTER} {CREATURE} draw", kind:"alphabet", minutes:5, prep:"low", mess:"low", supervision:"low",
+    tags:["alphabet","coloring","fine_motor"], modes:["full"], repeatable:true,
+    materials:["paper","chunky crayon"],
+    steps:["Draw a giant letter {LETTER} on paper.","Turn the {LETTER} into a {CREATURE} — add eyes, legs, a smile.","Say the letter sound together: '{LETTER_LOWER}-{LETTER_LOWER}-{LETTER_LOWER}!'"],
+    safety:"Watch for crayons heading to the mouth." },
+  { id:"shape_find_it", title:"Shape find-it", kind:"shapes", minutes:5, prep:"none", mess:"none", supervision:"low",
+    tags:["shapes","find_it","language"], modes:["full","spanish","low_prep"], repeatable:true,
+    materials:[],
+    steps:["Pick one shape: circle.","Find 3 circles in the house: a clock, a plate, a button.","Switch shapes if he's still interested."],
+    safety:"None." },
+  { id:"pretend_feed_animal", title:"Feed the stuffed animal", kind:"pretend", minutes:5, prep:"none", mess:"none", supervision:"low",
+    tags:["pretend","language","fine_motor"], modes:["full","spanish","low_prep"], repeatable:true,
+    materials:["a stuffed animal","a toy bowl and spoon"],
+    steps:["Pretend to feed the stuffed animal.","Talk for the animal: 'Yum! More please!'","Take turns feeding."],
+    safety:"None." },
+  { id:"pretend_phone_call", title:"Banana phone call", kind:"pretend", minutes:4, prep:"none", mess:"none", supervision:"low",
+    tags:["pretend","language"], modes:["full","spanish","low_prep"], repeatable:true,
+    materials:["a banana or wooden spoon"],
+    steps:["Hold a banana to your ear: 'Hello?'","Pretend to talk to Grandma.","Hand him the 'phone' — let him babble back."],
+    safety:"None." },
+  { id:"house_laundry_sort", title:"Laundry color sort", kind:"household", minutes:6, prep:"none", mess:"none", supervision:"low",
+    tags:["sorting","household","fine_motor","colors"], modes:["full","spanish","low_prep"], repeatable:true,
+    materials:["clean laundry"],
+    steps:["Sit by a basket of clean clothes.","Pick one piece, name the color, hand it to him for a 'pile'.","Try sorting by socks vs not-socks."],
+    safety:"Clean laundry only; no buttons in mouth." },
+  { id:"house_kitchen_helper", title:"Kitchen helper", kind:"household", minutes:5, prep:"none", mess:"low", supervision:"high",
+    tags:["fine_motor","household","language","measuring"], modes:["full","spanish"], repeatable:true,
+    materials:["a measuring cup, a bowl, dry rice or oats"],
+    steps:["Sit at the kitchen counter together.","Pour rice from one cup to the bowl.","Say 'pour, dump, scoop' as you go."],
+    safety:"No stove. No knives. Stay arm's-length." },
+  /* --- "Things That Go Together" / matching pairs (Unit 8) --- */
+  { id:"match_socks_shoes", title:"What goes together? Socks & shoes", kind:"sorting", minutes:6, prep:"low", mess:"none", supervision:"low",
+    tags:["matching","sorting","household","language","find_it"], modes:["full","spanish","low_prep"], repeatable:true,
+    materials:["a sock and a shoe","a cup and a spoon","a hat and a coat"],
+    steps:["Lay out a few familiar pairs, then mix them up.","Hold up one item: 'What goes with the sock?'","Cheer the match and name both: 'sock and shoe go together!'"],
+    safety:"None." },
+  { id:"match_kitchen_pairs", title:"Kitchen things that go together", kind:"household", minutes:6, prep:"low", mess:"none", supervision:"medium",
+    tags:["matching","sorting","household","language"], modes:["full","spanish","low_prep"], repeatable:true,
+    materials:["a cup and a lid","a bowl and a spoon","a pot and its lid"],
+    steps:["Set out cups, bowls, lids, and spoons all mixed up.","Find each pair together: 'The lid goes on the pot!'","Let him try fitting each lid or pairing each spoon to a bowl."],
+    safety:"Plastic only — no glass or sharp items." },
+  { id:"match_lids_containers", title:"Match the lids to the containers", kind:"fine_motor", minutes:6, prep:"low", mess:"none", supervision:"medium",
+    tags:["matching","sorting","fine_motor","problem_solving"], modes:["full","spanish","low_prep"], repeatable:true,
+    materials:["3-4 plastic containers with matching lids"],
+    steps:["Mix the containers and lids in a pile.","'Which lid goes with this one?' Try each lid together.","Snap the matching lid on. Cheer each pair that fits."],
+    safety:"Use containers too big to be a choking hazard." },
+  { id:"match_animal_baby", title:"Animal & baby match", kind:"language", minutes:5, prep:"low", mess:"none", supervision:"low",
+    tags:["matching","language","pretend","vocabulary"], modes:["full","spanish","low_prep"], repeatable:true,
+    materials:["toy animals or animal picture cards (grown-ups and babies)"],
+    steps:["Line up a few animals: 'Here is the mama cow.'","'Where is the baby cow?' Help him find the pair.","Make the animal sound together for each pair."],
+    safety:"None." },
+  { id:"match_picture_hunt", title:"Things-that-go-together hunt", kind:"language", minutes:6, prep:"none", mess:"none", supervision:"low",
+    tags:["matching","find_it","language","vocabulary"], modes:["full","spanish","low_prep"], repeatable:true,
+    materials:[],
+    steps:["Name a pair: 'toothbrush and toothpaste.'","Walk around and find both items together.","Try more pairs: pillow & blanket, shoe & sock, cup & water."],
+    safety:"None." },
+  { id:"match_sock_pairs", title:"Pair up the socks", kind:"sorting", minutes:6, prep:"none", mess:"none", supervision:"low",
+    tags:["matching","sorting","household","fine_motor","colors"], modes:["full","spanish","low_prep"], repeatable:true,
+    materials:["a basket of clean socks"],
+    steps:["Dump clean socks in a pile.","Find two that match: 'These go together!'","Roll or fold each pair as you find it."],
+    safety:"Clean laundry only." }
+];
+window.HSP.ACTIVITIES_QUERY = function (opts) {
+  const recent = opts.recentIds || [];
+  return window.HSP.ACTIVITIES.filter(a => {
+    if (recent.indexOf(a.id) !== -1) return false;
+    if (opts.kind && a.kind !== opts.kind) return false;
+    if (opts.tag && a.tags.indexOf(opts.tag) === -1) return false;
+    if (opts.tags && !opts.tags.every(t => a.tags.indexOf(t) !== -1)) return false;
+    if (opts.anyTag && !opts.anyTag.some(t => a.tags.indexOf(t) !== -1)) return false;
+    if (opts.excludeTags && opts.excludeTags.some(t => a.tags.indexOf(t) !== -1)) return false;
+    if (opts.mode && a.modes.indexOf(opts.mode) === -1) return false;
+    if (opts.maxMess) {
+      const order = { none: 0, low: 1, medium: 2, high: 3 };
+      if (order[a.mess] > order[opts.maxMess]) return false;
+    }
+    if (opts.maxPrep) {
+      const order = { none: 0, low: 1, medium: 2, high: 3 };
+      if (order[a.prep] > order[opts.maxPrep]) return false;
+    }
+    return true;
+  });
+};
+
+/* ---------- lib: dateUtils ---------- */
+window.HSP.dateUtils = (function () {
+  const DAY_NAMES = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  function parseISO(s) {
+    if (s instanceof Date) return new Date(s.getFullYear(), s.getMonth(), s.getDate());
+    const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(s);
+    if (!m) return new Date(s);
+    return new Date(parseInt(m[1],10), parseInt(m[2],10)-1, parseInt(m[3],10));
+  }
+  function toISO(d) {
+    const date = parseISO(d);
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return y + "-" + m + "-" + day;
+  }
+  function dayOfWeek(d) { return parseISO(d).getDay(); }
+  function isWeekend(d) { const w = dayOfWeek(d); return w === 0 || w === 6; }
+  function nextWeekday(d) {
+    let dt = parseISO(d);
+    do { dt = new Date(dt.getFullYear(), dt.getMonth(), dt.getDate() + 1); }
+    while (dt.getDay() === 0 || dt.getDay() === 6);
+    return dt;
+  }
+  function weekdaysBetween(from, to) {
+    const a = parseISO(from); const b = parseISO(to);
+    if (a.getTime() === b.getTime()) return 0;
+    const sign = b > a ? 1 : -1;
+    let count = 0; let cursor = new Date(a);
+    while (sign === 1 ? cursor < b : cursor > b) {
+      cursor = new Date(cursor.getFullYear(), cursor.getMonth(), cursor.getDate() + sign);
+      const w = cursor.getDay();
+      if (w !== 0 && w !== 6) count += sign;
+    }
+    return count;
+  }
+  function dayName(d) { return DAY_NAMES[parseISO(d).getDay()]; }
+  function format(d) {
+    const date = parseISO(d);
+    return date.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" });
+  }
+  function curriculumDayIndex(d) { const w = dayOfWeek(d); return (w === 0 || w === 6) ? null : w; }
+  return { parseISO, toISO, dayOfWeek, isWeekend, nextWeekday, weekdaysBetween, dayName, format, curriculumDayIndex };
+})();
+
+/* ---------- lib: random (mulberry32 via FNV seed) ---------- */
+window.HSP.makeRng = function (seedString) {
+  let h = 2166136261 >>> 0;
+  for (let i = 0; i < seedString.length; i++) {
+    h ^= seedString.charCodeAt(i);
+    h = Math.imul(h, 16777619) >>> 0;
+  }
+  function next() {
+    h |= 0; h = (h + 0x6d2b79f5) | 0;
+    let t = h;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  }
+  return {
+    next,
+    int(maxExclusive) { return Math.floor(next() * maxExclusive); },
+    pick(arr) { if (!arr || !arr.length) return null; return arr[Math.floor(next() * arr.length)]; },
+    sample(arr, n) {
+      if (!arr) return [];
+      const copy = arr.slice(); const out = [];
+      const take = Math.min(n, copy.length);
+      for (let i = 0; i < take; i++) {
+        const idx = Math.floor(next() * copy.length);
+        out.push(copy.splice(idx, 1)[0]);
+      }
+      return out;
+    }
+  };
+};
+
+/* ---------- lib: storage ---------- */
+window.HSP.storage = (function () {
+  const ROOT = "hsp.v4";
+  function load() {
+    try {
+      const raw = localStorage.getItem(ROOT);
+      if (!raw) return defaults();
+      const parsed = JSON.parse(raw);
+      return Object.assign(defaults(), parsed);
+    } catch (e) { console.warn("storage load failed, using defaults", e); return defaults(); }
+  }
+  function save(state) { localStorage.setItem(ROOT, JSON.stringify(state)); }
+  function reset() { localStorage.removeItem(ROOT); localStorage.removeItem("hsp.v3"); localStorage.removeItem("hsp.v2"); localStorage.removeItem("hsp.v1"); }
+  function defaults() {
+    return {
+      version: 4,
+      johnny: {
+        materialsAvailable: ["construction paper","crayons","playing cards","muffin tin","pom-poms","rice","painter's tape","stickers","pillows","soft balls","stuffed animals"],
+        spanishLevel: "moderate",
+        messTolerance: "low"
+      },
+      curriculumStart: { date: "2026-05-04", unit: 6, week: 2, day: 1 },
+      planLog: {},          /* { isoDate: { plans: { caregiverId: plan }, usedActivityIds: [], regenSeeds: { cid: n }, feedback: [...], completed } } */
+      activityHistory: [],
+      favorites: [],
+      avoided: [],
+      ui: { lastCaregiver: "mama" }
+    };
+  }
+  return { load, save, reset, defaults };
+})();
+
+/* ---------- lib: planGenerator ---------- */
+window.HSP.planGenerator = (function () {
+  const { CURRICULUM, CAREGIVERS, CAREGIVER_MODES, ACTIVITIES, ACTIVITIES_QUERY,
+          PATHWAYS, SPANISH, JOHNNY, dateUtils, makeRng } = window.HSP;
+
+  function recentActivityIds(state, limit) {
+    const ids = [];
+    for (let i = state.activityHistory.length - 1; i >= 0 && ids.length < limit; i--) {
+      const e = state.activityHistory[i];
+      if (e && e.activityId) ids.push(e.activityId);
+    }
+    return ids;
+  }
+  function pickActivity(rng, query, fallbackQuery) {
+    const matches = ACTIVITIES_QUERY(query);
+    if (matches.length) return rng.pick(matches);
+    if (fallbackQuery) {
+      const fallback = ACTIVITIES_QUERY(fallbackQuery);
+      if (fallback.length) return rng.pick(fallback);
+    }
+    const any = ACTIVITIES_QUERY({ recentIds: query.recentIds || [], excludeTags: query.excludeTags });
+    return rng.pick(any) || ACTIVITIES[0];
+  }
+  function modeForCaregiver(caregiverId) {
+    const cg = CAREGIVERS[caregiverId] || CAREGIVERS.mama;
+    return CAREGIVER_MODES[cg.mode];
+  }
+
+  function generateDailyPlan(date, caregiverId, state, opts) {
+    opts = opts || {};
+    const isoDate = dateUtils.toISO(date);
+    const target = dateUtils.parseISO(isoDate);
+    if (dateUtils.isWeekend(target)) {
+      const next = dateUtils.nextWeekday(target);
+      return { weekend: true, date: isoDate, dayOfWeek: dateUtils.dayName(target),
+        message: "No homeschool today — it's the weekend! Rest up and play freely.",
+        nextSchoolDay: dateUtils.toISO(next) };
+    }
+    const cgDef = CAREGIVERS[caregiverId] || CAREGIVERS.mama;
+    const mode  = modeForCaregiver(caregiverId);
+    const dayIdx = dateUtils.curriculumDayIndex(isoDate);
+    const skillRot = CURRICULUM.dayOfWeekSkills[dayIdx];
+    const loc = CURRICULUM.locationForDate(isoDate, dateUtils);
+    if (!loc || loc.beyondCurriculum) {
+      return { date: isoDate, dayOfWeek: dateUtils.dayName(target),
+        message: "You've completed the Playing Preschool year. Time to repeat favorites or explore freely.",
+        beyondCurriculum: true };
+    }
+
+    const dayLog = state.planLog[isoDate] || {};
+    const regenSeed = (dayLog.regenSeeds && dayLog.regenSeeds[caregiverId]) || 0;
+    const seedString = isoDate + "|" + caregiverId + "|" + regenSeed;
+    const rng = makeRng(seedString);
+    const senseFocus = (loc.sub && loc.sub.senseFocus) || null;
+    const dayTheme = (loc.sub && loc.sub.theme) || (loc.unit.name + " — " + skillRot.label);
+    const focusLetter = (loc.unit.letters && loc.unit.letters[0]) || null;
+
+    /* Tags this unit's play should lean toward — keeps activities on the CURRENT
+       unit's theme instead of pulling in a past unit's (e.g. smell from Five Senses). */
+    const unitFocus = CURRICULUM.unitFocusTags[loc.unit.n] || [];
+    /* smell/taste play belongs only to units that name it (Five Senses, Food).
+       Elsewhere it reads as a past unit leaking in — drop it. sight/touch/hearing
+       stay allowed because sorting/texture/sound activities carry them incidentally. */
+    const SENSE_TAGS = ["smell","taste"];
+    const excludeTags = SENSE_TAGS.filter(t => unitFocus.indexOf(t) === -1);
+
+    const recentIds = recentActivityIds(state, 12);
+    const avoided = state.avoided || [];
+    const usedToday = (dayLog.usedActivityIds || []).slice();
+    const messCap = (function () {
+      if (state.johnny.messTolerance === "none") return "none";
+      if (state.johnny.messTolerance === "low") return "low";
+      if (state.johnny.messTolerance === "medium") return "medium";
+      return "high";
+    })();
+    const effectiveMess = mode.allowMessy ? messCap : "low";
+    const baseQ = {
+      recentIds: recentIds.concat(avoided).concat(usedToday),
+      mode: mode.id,
+      maxMess: effectiveMess,
+      maxPrep: mode.id === "low_prep" ? "none" : (mode.id === "spanish" ? "low" : "medium"),
+      excludeTags: excludeTags
+    };
+
+    /* Today's focus tags — used to bias every pick toward what the day is about. */
+    const focusTags = [];
+    if (senseFocus) focusTags.push(senseFocus);
+    unitFocus.forEach(t => { if (focusTags.indexOf(t) === -1) focusTags.push(t); });
+    if (skillRot.primary && skillRot.primary !== "predicting" && skillRot.primary !== "recall_retell") focusTags.push(skillRot.primary);
+    if (skillRot.secondary) focusTags.push(skillRot.secondary);
+    /* On predicting/recall days, books are the main vehicle. */
+    if (skillRot.primary === "predicting") focusTags.push("predicting", "read_aloud");
+    if (skillRot.primary === "recall_retell") focusTags.push("language");
+
+    /* 0) A unit-themed activity LEADS the plan so the day clearly matches the
+       current curriculum unit (e.g. a pairs/matching activity on "Things That
+       Go Together"). Prefers the unit's most specific tag, then any unit tag. */
+    const themeTags = senseFocus ? [senseFocus] : unitFocus;
+    let unitThemeActivity = null;
+    if (themeTags.length) {
+      unitThemeActivity = pickActivity(rng,
+        Object.assign({}, baseQ, { anyTag: [themeTags[0]] }),
+        Object.assign({}, baseQ, { anyTag: themeTags }));
+    }
+
+    /* 1) Skill-aligned activity keeps the day's skill rotation represented. */
+    let skillActivity = null;
+    if (skillRot.primary === "alphabet" || skillRot.secondary === "numbers") {
+      skillActivity = pickActivity(rng, Object.assign({}, baseQ, { anyTag: [skillRot.primary, skillRot.secondary].filter(Boolean) }));
+    } else if (skillRot.primary === "predicting") {
+      skillActivity = pickActivity(rng,
+        Object.assign({}, baseQ, { anyTag: ["read_aloud","predicting"] }),
+        Object.assign({}, baseQ, { kind: "language" }));
+    } else if (skillRot.primary === "recall_retell") {
+      skillActivity = pickActivity(rng, Object.assign({}, baseQ, { anyTag: ["language","shapes"] }));
+    } else if (skillRot.secondary === "sorting") {
+      skillActivity = pickActivity(rng, Object.assign({}, baseQ, { anyTag: ["sorting"] }));
+    } else if (skillRot.secondary === "measuring") {
+      skillActivity = pickActivity(rng, Object.assign({}, baseQ, { anyTag: ["measuring","fine_motor"] }));
+    }
+
+    /* Relaxed query (drops `avoided`) — used when a sense-focused pick MUST land. */
+    const relaxedQ = {
+      recentIds: recentIds.concat(usedToday),
+      mode: mode.id,
+      maxMess: effectiveMess,
+      maxPrep: baseQ.maxPrep,
+      excludeTags: excludeTags
+    };
+
+    /* 2) Sensory — biased to today's senseFocus. On a sense day this is REQUIRED;
+       if strict filters return nothing, fall back through relaxed-avoided, then
+       drop the mode constraint, then any sensory. */
+    let sensory = null;
+    if (mode.id !== "low_prep") {
+      sensory = pickActivity(rng,
+        Object.assign({}, baseQ, { kind: "sensory", anyTag: senseFocus ? [senseFocus] : (unitFocus.length ? unitFocus : null) }),
+        Object.assign({}, baseQ, { kind: "sensory" }));
+      if (!sensory && senseFocus) {
+        sensory = pickActivity(rng,
+          Object.assign({}, relaxedQ, { kind: "sensory", anyTag: [senseFocus] }));
+      }
+      if (!sensory && senseFocus) {
+        /* Last resort for sense days: drop mode constraint so the day still feels themed. */
+        sensory = pickActivity(rng, {
+          recentIds: recentIds.concat(usedToday),
+          maxMess: effectiveMess,
+          kind: "sensory",
+          anyTag: [senseFocus]
+        });
+      }
+      if (!sensory) {
+        sensory = pickActivity(rng, Object.assign({}, baseQ, { kind: "sensory" }));
+      }
+    }
+
+    /* 3) Movement — try to tie to today's focus where possible. */
+    const moveAnyTag = ["movement"];
+    if (senseFocus === "hearing") moveAnyTag.unshift("hearing");
+    if (skillRot.secondary === "measuring") moveAnyTag.unshift("measuring");
+    if (skillRot.secondary === "numbers") moveAnyTag.unshift("numbers");
+    const movement = pickActivity(rng,
+      Object.assign({}, baseQ, { kind: "movement", anyTag: moveAnyTag }),
+      Object.assign({}, baseQ, { kind: "movement" }));
+
+    /* 4) Language — biased to senseFocus + day-skill words. On a sense day this
+       is also essential (especially for low_prep mode where there's no sensory
+       pick) — so it falls through the same relaxation chain. */
+    let language = null;
+    if (senseFocus) {
+      language = pickActivity(rng,
+        Object.assign({}, baseQ, { kind: "language", anyTag: [senseFocus] }));
+      if (!language) {
+        language = pickActivity(rng,
+          Object.assign({}, relaxedQ, { kind: "language", anyTag: [senseFocus] }));
+      }
+      if (!language) {
+        language = pickActivity(rng, {
+          recentIds: recentIds.concat(usedToday),
+          maxMess: effectiveMess,
+          kind: "language",
+          anyTag: [senseFocus]
+        });
+      }
+    }
+    if (!language) {
+      const langAnyTag = [];
+      if (skillRot.primary === "predicting") langAnyTag.push("predicting", "read_aloud");
+      if (skillRot.primary === "recall_retell") langAnyTag.push("language");
+      langAnyTag.push("find_it", "vocabulary");
+      language = pickActivity(rng,
+        Object.assign({}, baseQ, { kind: "language", anyTag: langAnyTag }),
+        Object.assign({}, baseQ, { kind: "language" }));
+    }
+
+    let coloring = null;
+    if (mode.id === "full" && rng.next() > 0.5) {
+      const colorTags = skillRot.primary === "alphabet" ? ["alphabet","coloring"] : null;
+      coloring = pickActivity(rng,
+        colorTags ? Object.assign({}, baseQ, { anyTag: colorTags }) : Object.assign({}, baseQ, { kind: "coloring" }),
+        Object.assign({}, baseQ, { kind: "coloring" }));
+    }
+    let findItGame = null;
+    if (mode.id === "low_prep") {
+      findItGame = pickActivity(rng,
+        Object.assign({}, baseQ, { anyTag: ["find_it"] }),
+        Object.assign({}, baseQ, { kind: "language" }));
+    }
+
+    const allChosen = [];
+    function add(a) { if (a && allChosen.indexOf(a) === -1) allChosen.push(a); }
+    add(unitThemeActivity); add(skillActivity); add(sensory); add(movement); add(language); add(coloring); add(findItGame);
+
+    const targetTotal = mode.activitiesCount;
+    /* Filler also prefers today's focus tags so we don't slip in off-theme activities. */
+    const dynamicExclude = recentIds.concat(avoided).concat(usedToday).concat(allChosen.map(a=>a.id));
+    while (allChosen.length < targetTotal) {
+      let filler = focusTags.length
+        ? pickActivity(rng, Object.assign({}, baseQ, { recentIds: dynamicExclude.slice(), anyTag: focusTags }))
+        : null;
+      if (!filler) filler = pickActivity(rng, Object.assign({}, baseQ, { recentIds: dynamicExclude.slice() }));
+      if (!filler || allChosen.indexOf(filler) !== -1) break;
+      allChosen.push(filler);
+      dynamicExclude.push(filler.id);
+    }
+    while (allChosen.length > targetTotal) allChosen.pop();
+
+    /* Contextualize titles/steps/materials with today's letter/sense before persisting. */
+    const ctx = { focusLetter, senseFocus, primarySkill: skillRot.primary, secondarySkill: skillRot.secondary };
+    const adapted = allChosen.map(a => window.HSP.contextualize(a, ctx));
+
+    let readAloud = null;
+    if (mode.includeReadAloud) readAloud = readAloudTopic(loc, senseFocus, skillRot, rng);
+    const rawBackup = pickActivity(rng, { recentIds: recentIds.concat(avoided).concat(allChosen.map(a=>a.id)), maxPrep: "none", maxMess: "low", anyTag: ["find_it","movement","pretend"], excludeTags: excludeTags });
+    const backup = window.HSP.contextualize(rawBackup, ctx);
+    const milestone = PATHWAYS.pickForDay(skillRot.primary, senseFocus, rng);
+    const spanishWords = mode.spanishExposure === "rich" ? SPANISH.setForDay(loc.unit.name, dayTheme, 7)
+      : (mode.spanishExposure === "light" ? SPANISH.setForDay(loc.unit.name, dayTheme, 3) : []);
+    const learningGoal = composeLearningGoal(loc, skillRot, senseFocus, mode);
+    const matSet = {};
+    adapted.forEach(a => (a.materials || []).forEach(m => { matSet[m] = true; }));
+    const materialsNeeded = Object.keys(matSet);
+
+    const planId = isoDate + "-" + caregiverId + "-" + regenSeed;
+    return {
+      planId, date: isoDate, dayOfWeek: dateUtils.dayName(target),
+      curriculum: { unitNumber: loc.unit.n, unitName: loc.unit.name,
+        unitGuidingQuestion: CURRICULUM.unitGuidingQuestion[loc.unit.n] || null,
+        week: loc.week, day: loc.day, focusLetter,
+        skillFocus: skillRot.label, primarySkill: skillRot.primary, secondarySkill: skillRot.secondary, senseFocus },
+      caregiver: { id: cgDef.id, label: cgDef.label, mode: mode.id, modeLabel: mode.label },
+      mainTheme: dayTheme, learningGoal, materialsNeeded, readAloud,
+      activities: adapted,
+      spanish: spanishWords, lowPrepBackup: backup, milestone,
+      adultInvolvement: mode.adultInvolvement,
+      tomorrowPreview: previewTomorrow(isoDate).previewText,
+      childAgeMonths: JOHNNY.ageMonthsAt(target),
+      regenSeed,
+      tone: "Warm, simple, low-pressure. Stop when he's done. Repeat what works."
+    };
+  }
+
+  function readAloudTopic(loc, senseFocus, skillRot, rng) {
+    const unit = loc.unit.name;
+    let suggestion;
+    if (unit === "Five Senses" && senseFocus === "hearing") suggestion = "Pick a picture book about sounds, listening, or animals — something with lots of noise words.";
+    else if (unit === "Five Senses" && senseFocus === "smell") suggestion = "Pick a book about food, kitchens, or gardens so you can talk about smells.";
+    else if (unit === "Five Senses" && senseFocus === "touch") suggestion = "Pick a touch-and-feel board book or any picture book with textures or animals.";
+    else if (unit === "Five Senses" && senseFocus === "sight") suggestion = "Pick a colorful 'look and find' book or a board book with bold pictures.";
+    else if (unit === "Five Senses") suggestion = "Pick any of your senses-themed books, or a familiar favorite he'll engage with.";
+    else suggestion = "Pick any picture book that fits \"" + unit + "\". A favorite is always fine.";
+    const prompts = skillRot.primary === "predicting"
+      ? ["Before you start, ask: 'What do you think this book is about?'","Pause on a busy page: 'What do you see? What's happening?'","Ask 'What do you think happens next?' once or twice."]
+      : skillRot.primary === "recall_retell"
+      ? ["After reading, close the book and ask: 'What did we just read about?'","Point to one favorite page and let him tell you about it.","Try retelling the start, middle, and end together."]
+      : ["Hunt for the focus letter on a couple of pages.","Pause and ask 'What is that?' on each page.","Re-read a favorite page if he asks."];
+    return { suggestion, prompts: rng.sample(prompts, 2) };
+  }
+  function composeLearningGoal(loc, skillRot, senseFocus, mode) {
+    const senses = {
+      hearing: "Notice sounds and put words to what we hear.",
+      sight: "Look closely and name what we see.",
+      smell: "Notice and name two or three smells.",
+      touch: "Feel different textures and use words for them.",
+      taste: "Try a flavor and put a word to it (sweet, salty)."
+    };
+    const skills = {
+      sorting: "Try grouping things that are alike.",
+      predicting: "Make a guess and then see what happens.",
+      measuring: "Compare sizes with words like big, small, more, less.",
+      alphabet: "Hear the focus letter sound a few times today.",
+      numbers: "Touch and count up to 5 or 10 with help.",
+      shapes: "Find a circle or square out in the world.",
+      recall_retell: "Tell back something you saw or read."
+    };
+    const main = senseFocus ? senses[senseFocus] : null;
+    const skill = skills[skillRot.primary] || skills[skillRot.secondary] || skills.sorting;
+    const pieces = [main, skill].filter(Boolean);
+    const closer = mode.id === "low_prep" ? "Keep it light — no pressure, just play."
+      : mode.id === "spanish" ? "Mix in Spanish words naturally as you go."
+      : "Follow Johnny's lead. Stop when he's done.";
+    return pieces.concat(closer).join(" ");
+  }
+  function previewTomorrow(date) {
+    const isoDate = dateUtils.toISO(date);
+    let next = dateUtils.parseISO(isoDate);
+    do { next = new Date(next.getFullYear(), next.getMonth(), next.getDate() + 1); }
+    while (next.getDay() === 0 || next.getDay() === 6);
+    const nextIso = dateUtils.toISO(next);
+    const loc = CURRICULUM.locationForDate(nextIso, dateUtils);
+    const dayIdx = dateUtils.curriculumDayIndex(nextIso);
+    const skillRot = CURRICULUM.dayOfWeekSkills[dayIdx];
+    if (!loc) return { previewText: "Tomorrow's plan will generate fresh in the morning." };
+    const sub = (loc.sub && loc.sub.theme) || (loc.unit.name + " — " + skillRot.label);
+    return { previewText: "Tomorrow (" + dateUtils.format(next) + "): " + sub + ". Skill focus — " + skillRot.label + "." };
+  }
+  function saveFeedback(plan, feedbackArray, state) {
+    state.planLog[plan.date] = state.planLog[plan.date] || {};
+    state.planLog[plan.date].caregiverId = plan.caregiver.id;
+    state.planLog[plan.date].planId = plan.planId;
+    state.planLog[plan.date].generatedAt = new Date().toISOString();
+    state.planLog[plan.date].feedback = feedbackArray.slice();
+    plan.activities.forEach(a => state.activityHistory.push({ date: plan.date, activityId: a.id, kind: a.kind, feedback: feedbackArray.slice() }));
+    if (state.activityHistory.length > 200) state.activityHistory = state.activityHistory.slice(-200);
+    adjustFromFeedback(state, plan.activities, feedbackArray);
+  }
+  function adjustFromFeedback(state, activities, feedback) {
+    const ids = activities.map(a => a.id);
+    const has = f => feedback.indexOf(f) !== -1;
+    if (has("loved")) ids.forEach(id => state.favorites.push(id));
+    if (has("skipped") || has("too_hard") || has("too_messy") || has("too_boring")) {
+      ids.forEach(id => { if (state.avoided.indexOf(id) === -1) state.avoided.push(id); });
+    }
+    if (state.avoided.length > 30) state.avoided = state.avoided.slice(-30);
+  }
+  function markDayComplete(plan, state) {
+    state.planLog[plan.date] = state.planLog[plan.date] || {};
+    state.planLog[plan.date].completed = true;
+    state.planLog[plan.date].completedAt = new Date().toISOString();
+  }
+  return { generateDailyPlan, saveFeedback, previewTomorrow, markDayComplete };
+})();
+
+/* ---------- Letter → creature map (used in dynamic activity titles) ---------- */
+window.HSP.LETTER_CREATURE = {
+  A: "alligator", B: "bear",      C: "cat",       D: "dog",       E: "elephant",
+  F: "fish",      G: "goat",      H: "hippo",     I: "inchworm",  J: "jellyfish",
+  K: "kangaroo",  L: "lion",      M: "monkey",    N: "newt",      O: "octopus",
+  P: "pig",       Q: "quail",     R: "rabbit",    S: "snake",     T: "turtle",
+  U: "unicorn",   V: "vulture",   W: "whale",     X: "fox",       Y: "yak",
+  Z: "zebra"
+};
+
+/* ---------- Contextualize an activity for today's curriculum focus ----------
+   Substitutes {LETTER}, {LETTER_LOWER}, {CREATURE} placeholders in titles, steps,
+   and materials so an activity tagged "alphabet" reads as "Letter S snake draw"
+   on a Letter Ss day, "Letter B bear draw" on a Letter Bb day, etc. */
+window.HSP.contextualize = function (activity, c) {
+  if (!activity) return activity;
+  const out = JSON.parse(JSON.stringify(activity));
+  if (!c) return out;
+  const fullLetter = c.focusLetter || ""; /* e.g. "Ss", "Cc", "Aa" */
+  const upper = fullLetter.charAt(0) || "";
+  const lower = (fullLetter.length > 1 ? fullLetter.charAt(1) : (upper ? upper.toLowerCase() : "")) || "";
+  const creature = window.HSP.LETTER_CREATURE[upper] || "creature";
+  function sub(s) {
+    if (typeof s !== "string") return s;
+    return s
+      .replace(/\{LETTER_LOWER\}/g, lower)
+      .replace(/\{LETTER_FULL\}/g, fullLetter)
+      .replace(/\{CREATURE\}/g, creature)
+      .replace(/\{LETTER\}/g, upper);
+  }
+  if (out.title) out.title = sub(out.title);
+  if (Array.isArray(out.steps)) out.steps = out.steps.map(sub);
+  if (Array.isArray(out.materials)) out.materials = out.materials.map(sub);
+  if (out.safety) out.safety = sub(out.safety);
+  return out;
+};
+
+/* ---------- Skill / letter labeling for activities ---------- */
+window.HSP.activityLabel = function (activity, c) {
+  /* c = plan.curriculum */
+  const tags = activity.tags || [];
+  /* Most specific: alphabet on letter days */
+  if (tags.indexOf("alphabet") !== -1 && c.focusLetter) {
+    return { text: "Letter " + c.focusLetter, color: "purple" };
+  }
+  /* Match the day's primary skill */
+  const SKILL_LABELS = {
+    sorting:       { text: "Sorting",          color: "yellow" },
+    predicting:    { text: "Predicting",       color: "pink"   },
+    measuring:     { text: "Measuring",        color: "blue"   },
+    numbers:       { text: "Numbers 1–10",     color: "green"  },
+    shapes:        { text: "Shapes",           color: "blue"   },
+    recall_retell: { text: "Recall & retell",  color: "pink"   }
+  };
+  if (tags.indexOf(c.primarySkill) !== -1 && SKILL_LABELS[c.primarySkill]) return SKILL_LABELS[c.primarySkill];
+  if (tags.indexOf(c.secondarySkill) !== -1 && SKILL_LABELS[c.secondarySkill]) return SKILL_LABELS[c.secondarySkill];
+  /* Sense focus */
+  if (c.senseFocus && tags.indexOf(c.senseFocus) !== -1) {
+    return { text: c.senseFocus.charAt(0).toUpperCase() + c.senseFocus.slice(1), color: "orange" };
+  }
+  /* Tag-based fallbacks */
+  if (tags.indexOf("hearing") !== -1)    return { text: "Hearing",      color: "teal"   };
+  if (tags.indexOf("touch") !== -1)      return { text: "Touch",        color: "orange" };
+  if (tags.indexOf("smell") !== -1)      return { text: "Smell",        color: "orange" };
+  if (tags.indexOf("taste") !== -1)      return { text: "Taste",        color: "red"    };
+  if (tags.indexOf("sight") !== -1)      return { text: "Sight",        color: "blue"   };
+  if (tags.indexOf("numbers") !== -1)    return { text: "Numbers 1–10", color: "green"  };
+  if (tags.indexOf("shapes") !== -1)     return { text: "Shapes",       color: "blue"   };
+  if (tags.indexOf("sorting") !== -1)    return { text: "Sorting",      color: "yellow" };
+  if (tags.indexOf("predicting") !== -1) return { text: "Predicting",   color: "pink"   };
+  if (tags.indexOf("movement") !== -1)   return { text: "Movement",     color: "red"    };
+  if (tags.indexOf("sensory") !== -1)    return { text: "Sensory play", color: "orange" };
+  if (tags.indexOf("language") !== -1)   return { text: "Language",     color: "green"  };
+  if (tags.indexOf("fine_motor") !== -1) return { text: "Fine motor",   color: "purple" };
+  if (tags.indexOf("find_it") !== -1)    return { text: "Find-it",      color: "teal"   };
+  if (tags.indexOf("pretend") !== -1)    return { text: "Pretend play", color: "pink"   };
+  return { text: "Play", color: "purple" };
+};
+
+/* ---------- HEADER mascot SVG ---------- */
+window.HSP.dinoSvg = function () {
+  /* Friendly cartoon brontosaurus */
+  return `
+    <svg class="header-mascot" width="64" height="64" viewBox="0 0 80 80" aria-hidden="true">
+      <defs>
+        <linearGradient id="dinoBody" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#43AA8B"/>
+          <stop offset="100%" stop-color="#2D8B6E"/>
+        </linearGradient>
+      </defs>
+      <ellipse cx="40" cy="58" rx="28" ry="14" fill="url(#dinoBody)"/>
+      <path d="M 18 55 Q 12 30 28 28 Q 32 22 38 28 Q 42 32 38 36 Q 30 36 26 50 Z" fill="url(#dinoBody)"/>
+      <circle cx="32" cy="30" r="3" fill="#fff"/>
+      <circle cx="32.5" cy="30" r="1.5" fill="#2A2335"/>
+      <path d="M 34 32 Q 36 33 36 35" stroke="#1f6850" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+      <path d="M 56 50 L 70 38 L 72 44 Z" fill="url(#dinoBody)"/>
+      <path d="M 22 52 Q 22 58 24 64 L 28 64 Q 28 58 28 54 Z" fill="#2D8B6E"/>
+      <path d="M 36 56 Q 36 62 38 68 L 42 68 Q 42 62 42 58 Z" fill="#2D8B6E"/>
+      <path d="M 48 56 Q 48 62 50 68 L 54 68 Q 54 62 54 58 Z" fill="#2D8B6E"/>
+      <!-- back spikes -->
+      <path d="M 22 30 L 20 26 L 24 28 Z" fill="#F4A261"/>
+      <path d="M 28 26 L 26 22 L 30 24 Z" fill="#F4A261"/>
+      <path d="M 38 50 L 42 46 L 44 50 Z" fill="#F4A261"/>
+      <path d="M 50 50 L 54 46 L 56 50 Z" fill="#F4A261"/>
+    </svg>`;
+};
+window.HSP.dinoStripSvg = function () {
+  return `<svg width="22" height="14" viewBox="0 0 22 14" aria-hidden="true">
+    <path d="M2 12 Q4 4 8 6 L11 4 Q14 6 18 4 L20 12 Z" fill="#F4A261" opacity="0.7"/>
+  </svg>`;
+};
+
+/* ---------- app: UI controller ---------- */
+(function () {
+  const HSP = window.HSP;
+  const { CAREGIVERS, CURRICULUM, JOHNNY, dateUtils, planGenerator, storage } = HSP;
+  let state = storage.load();
+  let view = "dashboard";
+  let currentPlan = null;
+
+  function $(sel, root) { return (root || document).querySelector(sel); }
+  function el(tag, attrs, children) {
+    const e = document.createElement(tag);
+    if (attrs) {
+      for (const k in attrs) {
+        if (k === "class") e.className = attrs[k];
+        else if (k === "html") e.innerHTML = attrs[k];
+        else if (k.indexOf("on") === 0) e.addEventListener(k.slice(2), attrs[k]);
+        else e.setAttribute(k, attrs[k]);
+      }
+    }
+    (children || []).forEach(c => {
+      if (c == null) return;
+      e.appendChild(typeof c === "string" ? document.createTextNode(c) : c);
+    });
+    return e;
+  }
+  function persist() { storage.save(state); }
+
+  function render() {
+    const root = $("#app");
+    root.innerHTML = "";
+    root.appendChild(renderHeader());
+    if (view === "dashboard") root.appendChild(renderDashboard());
+    else if (view === "settings") root.appendChild(renderSettings());
+    else if (view === "history")  root.appendChild(renderHistory());
+    root.appendChild(renderFooter());
+  }
+
+  function renderHeader() {
+    const wrap = el("header", { class: "top" });
+    const left = el("div", { class: "header-left" });
+    left.appendChild(el("div", { html: HSP.dinoSvg() }));
+    left.appendChild(el("div", null, [
+      el("h1", null, ["Johnny's Homeschool"]),
+      el("div", { class: "sub" }, [dateUtils.format(new Date()) + " · " + JOHNNY.ageMonthsAt(new Date()) + " months old"])
+    ]));
+    wrap.appendChild(left);
+    wrap.appendChild(el("nav", null, [
+      el("button", { class: view === "dashboard" ? "active" : "", onclick: () => { view = "dashboard"; render(); } }, ["Today"]),
+      el("button", { class: view === "history" ? "active" : "",   onclick: () => { view = "history"; render(); } }, ["History"]),
+      el("button", { class: view === "settings" ? "active" : "",  onclick: () => { view = "settings"; render(); } }, ["Settings"])
+    ]));
+    return wrap;
+  }
+  function renderFooter() {
+    const f = el("div", { class: "footer-help" });
+    f.appendChild(el("span", { html: HSP.dinoStripSvg() }));
+    f.appendChild(document.createTextNode("Follow Johnny's lead. Stop when he's done."));
+    f.appendChild(el("span", { html: HSP.dinoStripSvg() }));
+    return f;
+  }
+
+  function renderDashboard() {
+    const wrap = el("div");
+    const gen = el("section", { class: "panel" }, [el("h2", null, ["🦖 Generate today's plan"])]);
+    const lastCG = state.ui.lastCaregiver || "mama";
+    const select = el("select", { id: "caregiverSel", onchange: e => { state.ui.lastCaregiver = e.target.value; persist(); }});
+    Object.keys(CAREGIVERS).forEach(id => {
+      const opt = el("option", { value: id }, [CAREGIVERS[id].label]);
+      if (id === lastCG) opt.setAttribute("selected", "");
+      select.appendChild(opt);
+    });
+    const dateInput = el("input", { type: "date", id: "dateSel", value: dateUtils.toISO(new Date()) });
+    const generateBtn = el("button", { class: "primary", onclick: () => generate(false) }, ["Generate Today's Plan"]);
+    const regenBtn = el("button", { class: "secondary", onclick: () => generate(true) }, ["Regenerate"]);
+    gen.appendChild(el("div", { class: "row" }, [
+      el("label", { class: "field" }, ["Caregiver", select]),
+      el("label", { class: "field" }, ["Date", dateInput]),
+      generateBtn, regenBtn
+    ]));
+    wrap.appendChild(gen);
+    const out = el("div", { id: "planOut" });
+    wrap.appendChild(out);
+    if (currentPlan) renderPlanInto(out, currentPlan);
+    return wrap;
+  }
+
+  function generate(regenerate) {
+    const cgId = $("#caregiverSel").value;
+    const dt = $("#dateSel").value;
+    state.ui.lastCaregiver = cgId; persist();
+
+    const isoDate = dateUtils.toISO(dt);
+    state.planLog[isoDate] = state.planLog[isoDate] || {};
+    const dayLog = state.planLog[isoDate];
+    dayLog.plans = dayLog.plans || {};
+    dayLog.regenSeeds = dayLog.regenSeeds || {};
+    dayLog.usedActivityIds = dayLog.usedActivityIds || [];
+
+    if (regenerate) {
+      /* Free up this caregiver's prior picks (incl. backup) for today, bump seed, drop cache. */
+      if (dayLog.plans[cgId]) {
+        const old = dayLog.plans[cgId];
+        const oldIds = old.activities.map(a => a.id);
+        if (old.lowPrepBackup) oldIds.push(old.lowPrepBackup.id);
+        dayLog.usedActivityIds = dayLog.usedActivityIds.filter(id => oldIds.indexOf(id) === -1);
+        delete dayLog.plans[cgId];
+      }
+      dayLog.regenSeeds[cgId] = (dayLog.regenSeeds[cgId] || 0) + 1;
+    }
+
+    if (dayLog.plans[cgId]) {
+      currentPlan = dayLog.plans[cgId];
+    } else {
+      currentPlan = planGenerator.generateDailyPlan(dt, cgId, state, { regenerate });
+      if (currentPlan && !currentPlan.weekend && !currentPlan.beyondCurriculum) {
+        dayLog.plans[cgId] = currentPlan;
+        dayLog.caregiverId = cgId;
+        dayLog.planId = currentPlan.planId;
+        currentPlan.activities.forEach(a => {
+          if (dayLog.usedActivityIds.indexOf(a.id) === -1) dayLog.usedActivityIds.push(a.id);
+        });
+        if (currentPlan.lowPrepBackup && dayLog.usedActivityIds.indexOf(currentPlan.lowPrepBackup.id) === -1) {
+          dayLog.usedActivityIds.push(currentPlan.lowPrepBackup.id);
+        }
+      }
+    }
+    persist();
+    const out = $("#planOut"); out.innerHTML = "";
+    renderPlanInto(out, currentPlan);
+  }
+
+  /* ---------- plan card ---------- */
+  function renderPlanInto(parent, plan) {
+    if (plan.weekend) {
+      parent.appendChild(el("div", { class: "panel" }, [
+        el("div", { class: "weekend-banner" }, [
+          "🦕 ", plan.message, " ",
+          el("strong", null, ["Next school day: " + dateUtils.format(plan.nextSchoolDay)])
+        ])
+      ]));
+      return;
+    }
+    if (plan.beyondCurriculum) {
+      parent.appendChild(el("div", { class: "panel" }, [el("div", { class: "weekend-banner" }, [plan.message])]));
+      return;
+    }
+    const c = plan.curriculum;
+    const card = el("section", { class: "panel plan" });
+    card.appendChild(el("h2", { class: "theme" }, [plan.mainTheme]));
+    card.appendChild(el("div", { class: "date-line" }, [
+      dateUtils.format(plan.date) + " · " + plan.caregiver.label + " · " + plan.caregiver.modeLabel
+    ]));
+
+    card.appendChild(el("div", { class: "meta" }, [
+      metaCell("Unit", c.unitNumber + ". " + c.unitName),
+      metaCell("Week / Day", "Week " + c.week + ", Day " + c.day),
+      metaCell("Skill focus", c.skillFocus),
+      c.focusLetter ? metaCell("Focus letter", c.focusLetter) : null,
+      c.senseFocus ? metaCell("Sense focus", cap(c.senseFocus)) : null,
+      metaCell("Adult involvement", plan.adultInvolvement)
+    ]));
+
+    card.appendChild(el("div", { class: "goal" }, [el("strong", null, ["✨ Today's goal: "]), plan.learningGoal]));
+
+    if (plan.materialsNeeded && plan.materialsNeeded.length) {
+      card.appendChild(el("h3", null, ["🧺 Materials"]));
+      const ml = el("div", { class: "materials-list" });
+      plan.materialsNeeded.forEach(m => ml.appendChild(el("span", { class: "pill" }, [m])));
+      card.appendChild(ml);
+    }
+
+    if (plan.readAloud) {
+      const r = el("div", { class: "read-aloud" });
+      r.appendChild(el("strong", null, ["📖 Read-aloud: "]));
+      r.appendChild(document.createTextNode(plan.readAloud.suggestion));
+      const ul = el("ul");
+      plan.readAloud.prompts.forEach(p => ul.appendChild(el("li", null, [p])));
+      r.appendChild(ul);
+      card.appendChild(r);
+    }
+
+    /* ----- flat activities list ----- */
+    card.appendChild(el("h3", null, ["✏️ Today's activities"]));
+    const list = el("div", { class: "activities-list" });
+    plan.activities.forEach((a, i) => list.appendChild(renderActivity(a, i + 1, c)));
+    card.appendChild(list);
+
+    if (plan.spanish && plan.spanish.length) {
+      card.appendChild(el("h3", null, [plan.caregiver.mode === "spanish" ? "🌎 Spanish words & phrases" : "🌎 A few Spanish words to mix in"]));
+      const sl = el("div", { class: "spanish-list" });
+      plan.spanish.forEach(w => sl.appendChild(el("div", null, [el("span", { class: "es" }, [w.es]), " ", el("span", { class: "en" }, ["(" + w.en + ")"])])));
+      card.appendChild(sl);
+    }
+
+    if (plan.lowPrepBackup) {
+      const headTxt = plan.caregiver.mode === "low_prep" ? "🎒 Find-it / movement option" : "🎒 Low-prep backup";
+      card.appendChild(el("h3", null, [headTxt]));
+      const list2 = el("div", { class: "activities-list" });
+      list2.appendChild(renderActivity(plan.lowPrepBackup, "★", c));
+      card.appendChild(list2);
+    }
+
+    if (plan.milestone) {
+      card.appendChild(el("div", { class: "milestone" }, [
+        el("strong", null, ["🌱 Pathways.org milestone: "]),
+        plan.milestone.area + " — " + plan.milestone.milestone,
+        el("br"),
+        el("small", null, ["Try: " + plan.milestone.activities[0]])
+      ]));
+    }
+
+    /* feedback */
+    const fbBox = el("div", { class: "feedback" });
+    const FB = ["completed","loved","skipped","too_hard","too_easy","too_messy","too_boring"];
+    const FB_LABEL = { completed:"✓ Completed", loved:"♥ Loved it", skipped:"Skipped",
+      too_hard:"Too hard", too_easy:"Too easy", too_messy:"Too messy", too_boring:"Too boring" };
+    const existing = (state.planLog[plan.date] && state.planLog[plan.date].feedback) || [];
+    const selectedFb = new Set(existing);
+    FB.forEach(f => {
+      const btn = el("button", {
+        class: selectedFb.has(f) ? "selected" : "",
+        onclick: () => {
+          if (selectedFb.has(f)) selectedFb.delete(f); else selectedFb.add(f);
+          planGenerator.saveFeedback(plan, Array.from(selectedFb), state);
+          if (selectedFb.has("completed")) planGenerator.markDayComplete(plan, state);
+          persist(); render();
+        }
+      }, [FB_LABEL[f]]);
+      fbBox.appendChild(btn);
+    });
+    card.appendChild(el("h3", null, ["💬 Parent feedback"]));
+    card.appendChild(fbBox);
+
+    card.appendChild(el("div", { class: "tomorrow" }, [el("strong", null, ["🌟 Notes for tomorrow: "]), plan.tomorrowPreview]));
+    parent.appendChild(card);
+  }
+
+  function metaCell(label, value) {
+    return el("div", null, [el("div", { class: "meta-label" }, [label]), el("div", { class: "meta-value" }, [value])]);
+  }
+
+  /* ----- single activity card with skill/letter focus pill ----- */
+  const COLOR_CYCLE = ["red","orange","yellow","green","blue","purple","pink","teal"];
+  const COLOR_VALUES = {
+    red:"var(--c-red)", orange:"var(--c-orange)", yellow:"var(--c-yellow)",
+    green:"var(--c-green)", blue:"var(--c-blue)", purple:"var(--c-purple)",
+    pink:"var(--c-pink)", teal:"var(--c-teal)"
+  };
+  function renderActivity(a, num, c) {
+    const focus = HSP.activityLabel(a, c || {});
+    const colorVar = COLOR_VALUES[focus.color] || "var(--c-purple)";
+    const card = el("div", { class: "activity-card", style: "--card-color:" + colorVar + ";" });
+    const head = el("div", { class: "activity-head" }, [
+      num != null ? el("span", { class: "activity-num" }, [String(num)]) : null,
+      el("div", { class: "activity-title" }, [a.title]),
+      el("span", { class: "focus-pill" }, [focus.text])
+    ]);
+    card.appendChild(head);
+    card.appendChild(el("div", { class: "activity-meta" }, [
+      el("span", { class: "pill muted" }, [a.minutes + " min"]),
+      el("span", { class: "pill muted" }, ["prep: " + a.prep]),
+      el("span", { class: "pill muted" }, ["mess: " + a.mess]),
+      el("span", { class: "pill muted" }, [(a.kind || "").replace("_", " ")])
+    ]));
+    const ol = el("ol", { class: "activity-steps" });
+    a.steps.forEach(s => ol.appendChild(el("li", null, [s])));
+    card.appendChild(ol);
+    if (a.materials && a.materials.length) card.appendChild(el("div", { class: "activity-mat" }, ["Materials: " + a.materials.join(", ")]));
+    if (a.safety && a.safety.toLowerCase() !== "none.") card.appendChild(el("div", { class: "activity-safety" }, ["⚠ " + a.safety]));
+    return card;
+  }
+
+  function cap(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : s; }
+
+  /* ---------- settings ---------- */
+  function renderSettings() {
+    const wrap = el("div");
+    const profile = el("section", { class: "panel" }, [el("h2", null, ["🦕 Johnny"])]);
+    profile.appendChild(infoLine("Name", JOHNNY.name));
+    profile.appendChild(infoLine("Birthday", JOHNNY.birthday));
+    profile.appendChild(infoLine("Age today", JOHNNY.ageMonthsAt(new Date()) + " months"));
+    profile.appendChild(infoLine("Recognizes", "Numbers 1–10, all letters, most shapes"));
+    profile.appendChild(infoLine("Coloring", "Emerging interest. No tracing yet."));
+    profile.appendChild(infoLine("Crafts", "Low interest — avoid by default"));
+    wrap.appendChild(profile);
+
+    const cur = el("section", { class: "panel" }, [el("h2", null, ["📅 Curriculum start"])]);
+    cur.appendChild(infoLine("Anchor date", state.curriculumStart.date));
+    cur.appendChild(infoLine("Anchor lesson", "Unit " + state.curriculumStart.unit + " (" + CURRICULUM.units[state.curriculumStart.unit-1].name + "), Week " + state.curriculumStart.week + ", Day " + state.curriculumStart.day));
+    wrap.appendChild(cur);
+
+    const mat = el("section", { class: "panel" }, [el("h2", null, ["🧺 Materials available at home"])]);
+    const matInput = el("input", { type: "text", id: "matInput", placeholder: "add a material and press Enter", style: "width:100%;" });
+    matInput.addEventListener("keydown", e => {
+      if (e.key === "Enter") {
+        const v = matInput.value.trim();
+        if (v) { state.johnny.materialsAvailable.push(v); matInput.value = ""; persist(); render(); }
+      }
+    });
+    mat.appendChild(matInput);
+    const matList = el("div", { class: "materials-list", style: "margin-top:12px;" });
+    state.johnny.materialsAvailable.forEach((m, idx) => {
+      matList.appendChild(el("span", { class: "pill", title: "Click to remove",
+        onclick: () => { state.johnny.materialsAvailable.splice(idx, 1); persist(); render(); }
+      }, [m, " ✕"]));
+    });
+    mat.appendChild(matList);
+    wrap.appendChild(mat);
+
+    const mess = el("section", { class: "panel" }, [el("h2", null, ["🎨 Mess tolerance"])]);
+    const messSel = el("select", { onchange: e => { state.johnny.messTolerance = e.target.value; persist(); } });
+    ["none","low","medium","high"].forEach(v => {
+      const opt = el("option", { value: v }, [v]);
+      if (state.johnny.messTolerance === v) opt.setAttribute("selected", "");
+      messSel.appendChild(opt);
+    });
+    mess.appendChild(messSel);
+    wrap.appendChild(mess);
+
+    const sp = el("section", { class: "panel" }, [el("h2", null, ["🌎 Spanish exposure"])]);
+    const spSel = el("select", { onchange: e => { state.johnny.spanishLevel = e.target.value; persist(); } });
+    ["minimal","moderate","rich"].forEach(v => {
+      const opt = el("option", { value: v }, [v]);
+      if (state.johnny.spanishLevel === v) opt.setAttribute("selected", "");
+      spSel.appendChild(opt);
+    });
+    sp.appendChild(spSel);
+    sp.appendChild(el("p", { style: "font-size:12px;color:var(--muted);margin-top:8px;font-weight:600;" }, ["Nana / Papa days always include rich Spanish exposure regardless of this setting."]));
+    wrap.appendChild(sp);
+
+    const av = el("section", { class: "panel" }, [
+      el("h2", null, ["♥ Favorites & avoided"]),
+      el("h3", null, ["Favorites (" + state.favorites.length + ")"]),
+      el("p", { style: "font-size:13px;color:var(--muted);font-weight:600;" }, [state.favorites.join(", ") || "None yet — mark activities as Loved to add."]),
+      el("h3", null, ["Avoided (" + state.avoided.length + ")"]),
+      el("p", { style: "font-size:13px;color:var(--muted);font-weight:600;" }, [state.avoided.join(", ") || "None yet — Skipped / Too Hard / Too Messy / Too Boring add to this list."]),
+      el("button", { class: "ghost", style: "margin-top:14px;",
+        onclick: () => { if (confirm("Reset all saved data (history, feedback, settings)?")) { storage.reset(); state = storage.load(); render(); } }
+      }, ["Reset all data"])
+    ]);
+    wrap.appendChild(av);
+    return wrap;
+  }
+  function infoLine(k, v) {
+    return el("div", { class: "row", style: "justify-content:space-between;border-top:1px solid var(--line);padding:10px 0;" }, [
+      el("div", { style: "font-family:'Fredoka',sans-serif;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;font-weight:500;" }, [k]),
+      el("div", { style: "font-size:14px;font-weight:700;" }, [v])
+    ]);
+  }
+
+  function renderHistory() {
+    const wrap = el("section", { class: "panel" }, [el("h2", null, ["📚 History"])]);
+    const dates = Object.keys(state.planLog).sort().reverse();
+    if (!dates.length) {
+      wrap.appendChild(el("p", { style: "color:var(--muted);font-size:14px;font-weight:600;" }, ["No plans generated yet. Head to Today and click Generate."]));
+      return wrap;
+    }
+    dates.forEach(d => {
+      const entry = state.planLog[d];
+      const fb = (entry.feedback || []).map(f => f.replace(/_/g, " ")).join(", ");
+      const cgs = entry.plans ? Object.keys(entry.plans).map(id => (CAREGIVERS[id] || {}).label || id).join(", ") : ((CAREGIVERS[entry.caregiverId] || {}).label || entry.caregiverId || "—");
+      wrap.appendChild(el("div", { class: "history-row" }, [
+        el("div", { class: "h-date" }, [dateUtils.format(d)]),
+        el("div", null, [cgs, entry.completed ? " · ✓ completed" : ""]),
+        el("div", { class: "h-fb" }, [fb || "—"])
+      ]));
+    });
+    return wrap;
+  }
+
+  document.addEventListener("DOMContentLoaded", render);
+})();
+</script>
+</body>
+</html>
