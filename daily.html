@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Daily Planner</title>
+<style>
+/* === RESET === */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+button { font: inherit; cursor: pointer; }
+input, textarea { font: inherit; }
+
+/* === TOKENS === */
+:root {
+  --bg: #FDF6EC;
+  --card: #FFFFFF;
+  --ink: #2B1F1A;
+  --muted: #7C6C63;
+  --border: rgba(43,31,26,0.12);
+  --border-strong: rgba(43,31,26,0.24);
+  --red: #CC4A3C;
+  --red-soft: #FDECEA;
+  --orange: #E07B39;
+  --blue: #3A86C8;
+  --blue-soft: #E3EEFA;
+  --green: #3DAA7E;
+  --green-soft: #E0F5EC;
+  --yellow: #F0B429;
+  --yellow-soft: #FEF4D6;
+  --shadow: 0 1px 3px rgba(43,31,26,0.08), 0 4px 12px rgba(43,31,26,0.06);
+  --r: 16px;
+  --rp: 999px;
+}
+
+/* === BASE === */
+html, body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+  min-height: 100vh;
+}
+.wrap { max-width: 620px; margin: 0 auto; padding: 16px 14px 60px; }
+
+/* === HEADER === */
+.hdr { margin-bottom: 16px; }
+.hdr h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; color: var(--ink); }
+.hdr .sub { font-size: 13px; color: var(--muted); margin-top: 2px; }
+
+/* === TAB NAV ===
+   Key fix: overflow-x:auto + flex-shrink:0 on buttons
+   so Tracking tab is never clipped on mobile            */
+.tabs {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding: 0 0 4px;
+  /* bleed to edges so scroll shadow isn't clipped */
+  margin: 0 -14px 18px;
+  padding-left: 14px;
+  padding-right: 14px;
+}
+.tabs::-webkit-scrollbar { display: none; }
+.tabs button {
+  flex-shrink: 0;
+  padding: 8px 18px;
+  border-radius: var(--rp);
+  border: 2px solid var(--border);
+  background: var(--card);
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.tabs button.on {
+  background: var(--red);
+  color: #fff;
+  border-color: var(--red);
+}
+
+/* === SECTION HEADING === */
+.sh {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 20px 0 8px;
+}
+.sh:first-child { margin-top: 0; }
+
+/* === CARD === */
+.card {
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r);
+  padding: 16px;
+  box-shadow: var(--shadow);
+  margin-bottom: 12px;
+}
+
+/* === DAY STRIP === */
+.days {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-bottom: 18px;
+}
+.days button {
+  padding: 7px 15px;
+  border-radius: var(--rp);
+  border: 2px solid var(--border);
+  background: var(--card);
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 700;
+  transition: all 0.12s;
+}
+.days button.on {
+  background: var(--card);
+  border-color: var(--red);
+  color: var(--red);
+}
+
+/* === CARD TOPBAR === */
+.ctop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.ctitle {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.lnk { background: none; border: none; color: var(--red); font-size: 14px; font-weight: 700; }
+
+/* === TEXTAREA === */
+textarea {
+  width: 100%;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 11px 13px;
+  font-size: 14px;
+  color: var(--ink);
+  background: var(--bg);
+  resize: vertical;
+  min-height: 110px;
+  line-height: 1.6;
+}
+textarea:focus { outline: none; border-color: var(--red); }
+textarea::placeholder { color: var(--muted); opacity: 0.65; }
+
+/* === BIG BUTTON === */
+.btn {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  border-radius: var(--rp);
+  border: none;
+  background: var(--red);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 800;
+  margin-top: 10px;
+  box-shadow: 0 3px 0 rgba(140,30,20,0.3);
+  transition: transform 0.12s, box-shadow 0.12s;
+}
+.btn:active { transform: translateY(2px); box-shadow: none; }
+
+.btn-sm {
+  display: inline-block;
+  padding: 9px 18px;
+  border-radius: var(--rp);
+  border: 2px solid var(--border);
+  background: var(--card);
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* === LIST ROWS === */
+.row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 0;
+  border-top: 1.5px solid var(--border);
+}
+.row:first-child { border-top: none; padding-top: 0; }
+
+.circle {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  background: var(--card);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+  transition: background 0.15s, border-color 0.15s;
+}
+.circle.done { background: var(--green); border-color: var(--green); color: #fff; }
+
+/* === MEAL INPUTS === */
+.meal-lbl { font-size: 12px; font-weight: 700; color: var(--muted); min-width: 64px; }
+.meal-inp {
+  flex: 1;
+  border: none;
+  border-bottom: 1.5px solid var(--border);
+  background: transparent;
+  font-size: 14px;
+  color: var(--ink);
+  padding: 2px 0;
+}
+.meal-inp:focus { outline: none; border-bottom-color: var(--red); }
+.meal-inp::placeholder { color: var(--muted); opacity: 0.6; }
+
+/* === WATER === */
+.water-stat { text-align: center; margin-bottom: 14px; }
+.water-num { font-size: 48px; font-weight: 800; color: var(--blue); line-height: 1; }
+.water-of { font-size: 14px; color: var(--muted); margin-top: 2px; }
+.cups {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.cup {
+  width: 42px;
+  height: 48px;
+  border: 2.5px solid var(--blue);
+  border-radius: 4px 4px 8px 8px;
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+  background: transparent;
+}
+.cup-fill {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  background: var(--blue);
+  height: 0;
+  transition: height 0.2s ease;
+}
+.cup.full .cup-fill { height: 100%; }
+.cup-lbl {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  z-index: 1;
+}
+
+/* === GROCERY === */
+.g-add { display: flex; gap: 8px; margin-bottom: 12px; }
+.g-inp {
+  flex: 1;
+  border: 1.5px solid var(--border);
+  border-radius: var(--rp);
+  padding: 10px 14px;
+  font-size: 14px;
+  color: var(--ink);
+  background: var(--card);
+}
+.g-inp:focus { outline: none; border-color: var(--red); }
+.g-add .btn { width: auto; margin-top: 0; padding: 10px 18px; }
+.g-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: 10px;
+  background: var(--bg);
+  margin-bottom: 5px;
+}
+.g-item.done span { text-decoration: line-through; color: var(--muted); }
+.g-del { background: none; border: none; color: var(--muted); font-size: 18px; margin-left: auto; }
+
+/* === TRACKING GRID (2 col, stacks fine on mobile) === */
+.tgrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.tcard {
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  padding: 14px 12px;
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+.tcard .em { font-size: 22px; margin-bottom: 5px; }
+.tcard .val { font-size: 30px; font-weight: 800; line-height: 1; }
+.tcard .lbl { font-size: 11px; color: var(--muted); font-weight: 700; margin-top: 3px; letter-spacing: 0.03em; }
+.tcard.meals .val { color: var(--orange); }
+.tcard.water .val { color: var(--blue); }
+.tcard.move .val  { color: var(--green); }
+.tcard.mood .val  { font-size: 26px; }
+
+/* === MOOD === */
+.moods { display: flex; gap: 8px; flex-wrap: wrap; }
+.moods button {
+  padding: 9px 14px;
+  border-radius: var(--rp);
+  border: 2px solid var(--border);
+  background: var(--card);
+  font-size: 22px;
+  transition: all 0.12s;
+}
+.moods button.on { border-color: var(--yellow); background: var(--yellow-soft); }
+
+/* === LOG ROWS === */
+.log-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 0;
+  border-top: 1.5px solid var(--border);
+}
+.log-row:first-child { border-top: none; padding-top: 0; }
+.log-t { font-size: 11px; color: var(--muted); font-weight: 700; min-width: 38px; }
+.log-x { flex: 1; font-size: 13px; }
+.tag {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: var(--rp);
+}
+.tag.meal  { background: var(--red-soft);   color: var(--red); }
+.tag.water { background: var(--blue-soft);  color: var(--blue); }
+.tag.move  { background: var(--green-soft); color: var(--green); }
+.tag.plan  { background: var(--yellow-soft); color: #96700A; }
+
+/* === EMPTY === */
+.empty { text-align: center; padding: 24px 0; color: var(--muted); font-size: 13px; }
+.empty .ei { font-size: 32px; margin-bottom: 8px; }
+
+/* === HIDDEN === */
+.gone { display: none !important; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hdr">
+    <h1>Daily Planner</h1>
+    <div class="sub">meals &middot; movement &middot; hydration</div>
+  </div>
+
+  <!-- TAB NAV: scrollable strip, all 4 tabs always reachable on mobile -->
+  <div class="tabs" id="tabs">
+    <button class="on" onclick="go('plan')">📋 Plan</button>
+    <button onclick="go('water')">💧 Water</button>
+    <button onclick="go('groceries')">🛒 Groceries</button>
+    <button onclick="go('tracking')">📊 Tracking</button>
+  </div>
+
+  <!-- ══════════════ PLAN ══════════════ -->
+  <div id="pg-plan">
+
+    <div class="sh">Day</div>
+    <div class="days" id="dayStrip"></div>
+
+    <div class="sh">Today's Schedule</div>
+    <div class="card">
+      <div class="ctop">
+        <div class="ctitle">📅 Schedule</div>
+        <button class="lnk" onclick="clearSched()">clear</button>
+      </div>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:10px;">Paste your calendar or type your day — anything that affects meal timing.</p>
+      <textarea id="schedTxt" placeholder="e.g.&#10;9:00 client&#10;10:00 client&#10;11:30 lunch break&#10;1:00 client" oninput="autoSaveSched()"></textarea>
+    </div>
+
+    <div class="sh">Workout</div>
+    <div class="card">
+      <div id="workouts"></div>
+      <button class="btn-sm" style="margin-top:10px;width:100%;" onclick="newWorkout()">+ Add workout</button>
+    </div>
+
+    <div class="sh">Meals</div>
+    <div class="card" id="mealCard"></div>
+
+  </div><!-- /plan -->
+
+  <!-- ══════════════ WATER ══════════════ -->
+  <div id="pg-water" class="gone">
+    <div class="sh">Hydration</div>
+    <div class="card">
+      <div class="water-stat">
+        <div class="water-num" id="wNum">0</div>
+        <div class="water-of" id="wOf">of 8 cups</div>
+      </div>
+      <div class="cups" id="cupGrid"></div>
+      <button class="btn" onclick="addCup()">+ Log a cup</button>
+    </div>
+    <div class="sh">Log</div>
+    <div class="card" id="wLog"></div>
+  </div>
+
+  <!-- ══════════════ GROCERIES ══════════════ -->
+  <div id="pg-groceries" class="gone">
+    <div class="sh">Shopping List</div>
+    <div class="card">
+      <div class="g-add">
+        <input class="g-inp" id="gInp" type="text" placeholder="Add item…" onkeydown="if(event.key==='Enter')addItem()">
+        <button class="btn" onclick="addItem()">Add</button>
+      </div>
+      <div id="gList"></div>
+    </div>
+  </div>
+
+  <!-- ══════════════ TRACKING ══════════════ -->
+  <div id="pg-tracking" class="gone">
+
+    <div class="sh">Today at a Glance</div>
+    <div class="tgrid">
+      <div class="tcard meals"><div class="em">🍽️</div><div class="val" id="tMeals">0</div><div class="lbl">meals</div></div>
+      <div class="tcard water"><div class="em">💧</div><div class="val" id="tWater">0</div><div class="lbl">cups water</div></div>
+      <div class="tcard move"> <div class="em">🏃</div><div class="val" id="tMove">0</div> <div class="lbl">workouts</div></div>
+      <div class="tcard mood"> <div class="em">😊</div><div class="val" id="tMood">—</div> <div class="lbl">mood</div></div>
+    </div>
+
+    <div class="sh">Mood Check-in</div>
+    <div class="card">
+      <div class="moods" id="moodRow">
+        <button data-m="😄" onclick="pickMood(this)">😄</button>
+        <button data-m="🙂" onclick="pickMood(this)">🙂</button>
+        <button data-m="😐" onclick="pickMood(this)">😐</button>
+        <button data-m="😔" onclick="pickMood(this)">😔</button>
+        <button data-m="😤" onclick="pickMood(this)">😤</button>
+      </div>
+    </div>
+
+    <div class="sh">Activity Log</div>
+    <div class="card" id="aLog"></div>
+
+    <div class="sh">Notes</div>
+    <div class="card">
+      <textarea id="notesTxt" placeholder="How did today go? Anything to remember for tomorrow…" rows="3" oninput="saveNotes()"></textarea>
+    </div>
+
+  </div><!-- /tracking -->
+
+</div><!-- /wrap -->
+
+<script>
+// ─── Storage ──────────────────────────────────────────────────────────────
+const KEY = "dp2";
+let S = {};
+try { S = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch {}
+const save = () => localStorage.setItem(KEY, JSON.stringify(S));
+
+// ─── Helpers ──────────────────────────────────────────────────────────────
+const $ = id => document.getElementById(id);
+const h = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+const now = () => new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});
+const todayDow = () => new Date().getDay();
+
+// selected day (0=Sun … 6=Sat), defaults to today
+if (S.dow === undefined) S.dow = todayDow();
+
+// day bucket
+function D() {
+  const k = "d" + S.dow;
+  if (!S[k]) S[k] = { sched:"", workouts:[], meals:{}, water:0, wlog:[], mood:"", notes:"", log:[] };
+  return S[k];
+}
+
+// append to activity log
+function logIt(type, text) {
+  const d = D(); if (!d.log) d.log = [];
+  d.log.push({ t: now(), type, text });
+  save();
+  refreshLog();
+}
+
+// ─── Tab switching ────────────────────────────────────────────────────────
+const PAGES = ["plan","water","groceries","tracking"];
+let curPage = "plan";
+
+function go(p) {
+  curPage = p;
+  PAGES.forEach(id => {
+    $("pg-"+id).classList.toggle("gone", id !== p);
+  });
+  $("tabs").querySelectorAll("button").forEach((b,i) => {
+    b.classList.toggle("on", PAGES[i] === p);
+  });
+  if (p === "water")    renderWater();
+  if (p === "groceries") renderGroceries();
+  if (p === "tracking") renderTracking();
+}
+
+// ─── Day strip ────────────────────────────────────────────────────────────
+const DAYS = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+function renderDays() {
+  const el = $("dayStrip");
+  el.innerHTML = DAYS.map((d,i) =>
+    `<button class="${i===S.dow?"on":""}" onclick="selDay(${i})">${d}</button>`
+  ).join("");
+}
+function selDay(i) { S.dow = i; save(); renderAll(); }
+
+// ─── Schedule ─────────────────────────────────────────────────────────────
+function renderSched() {
+  $("schedTxt").value = D().sched || "";
+}
+function autoSaveSched() {
+  D().sched = $("schedTxt").value;
+  save();
+}
+function clearSched() {
+  $("schedTxt").value = "";
+  D().sched = "";
+  save();
+}
+
+// ─── Workouts ─────────────────────────────────────────────────────────────
+function renderWorkouts() {
+  const d = D();
+  const el = $("workouts");
+  if (!d.workouts.length) {
+    el.innerHTML = `<div class="empty"><div class="ei">🏃</div>No workouts added yet</div>`;
+    return;
+  }
+  el.innerHTML = d.workouts.map((w,i) => `
+    <div class="row">
+      <button class="circle ${w.done?"done":""}" onclick="toggleW(${i})">${w.done?"✓":""}</button>
+      <div style="flex:1">
+        <div style="font-weight:700">${h(w.name)}</div>
+        ${w.meta ? `<div style="font-size:12px;color:var(--muted)">${h(w.meta)}</div>` : ""}
+      </div>
+      <button style="background:none;border:none;color:var(--muted);font-size:18px" onclick="delW(${i})">×</button>
+    </div>`).join("");
+}
+function newWorkout() {
+  const name = prompt("Workout name:");
+  if (!name?.trim()) return;
+  const meta = prompt("Details (duration, intensity — optional):") || "";
+  D().workouts.push({ name: name.trim(), meta: meta.trim(), done: false });
+  save(); renderWorkouts();
+}
+function toggleW(i) {
+  const d = D();
+  d.workouts[i].done = !d.workouts[i].done;
+  if (d.workouts[i].done) logIt("move", d.workouts[i].name + " ✓");
+  save(); renderWorkouts();
+  if (curPage === "tracking") refreshGlance();
+}
+function delW(i) {
+  D().workouts.splice(i,1);
+  save(); renderWorkouts();
+}
+
+// ─── Meals ────────────────────────────────────────────────────────────────
+const MEAL_SLOTS = [
+  ["breakfast","Breakfast"],
+  ["am","AM Snack"],
+  ["lunch","Lunch"],
+  ["pm","PM Snack"],
+  ["dinner","Dinner"],
+  ["evening","Evening"],
+];
+function renderMeals() {
+  const d = D();
+  $("mealCard").innerHTML = MEAL_SLOTS.map(([id,label]) => `
+    <div class="row">
+      <div class="meal-lbl">${label}</div>
+      <input class="meal-inp" type="text" placeholder="…"
+        value="${h(d.meals[id]||"")}"
+        onchange="saveMeal('${id}',this.value)">
+    </div>`).join("");
+}
+function saveMeal(id, val) {
+  const d = D();
+  d.meals[id] = val.trim();
+  if (d.meals[id]) logIt("meal", MEAL_SLOTS.find(s=>s[0]===id)[1] + ": " + d.meals[id]);
+  save();
+  if (curPage === "tracking") refreshGlance();
+}
+
+// ─── Water ────────────────────────────────────────────────────────────────
+const GOAL = 8;
+function renderWater() {
+  const d = D();
+  const c = d.water || 0;
+  $("wNum").textContent = c;
+  $("wOf").textContent = "of " + GOAL + " cups";
+  // cups
+  $("cupGrid").innerHTML = Array.from({length:GOAL},(_,i) => `
+    <div class="cup ${i<c?"full":""}" onclick="setCups(${i+1})">
+      <div class="cup-fill"></div>
+      <div class="cup-lbl">${i<c?"💧":"○"}</div>
+    </div>`).join("");
+  // log
+  const log = d.wlog || [];
+  $("wLog").innerHTML = log.length
+    ? [...log].reverse().map(e=>`
+        <div class="log-row">
+          <div class="log-t">${e.t}</div>
+          <div class="log-x">${h(e.text)}</div>
+          <span class="tag water">water</span>
+        </div>`).join("")
+    : `<div class="empty"><div class="ei">💧</div>No water logged yet</div>`;
+}
+function addCup() {
+  const d = D();
+  d.water = (d.water||0) + 1;
+  if (!d.wlog) d.wlog = [];
+  d.wlog.push({ t: now(), text: "Cup " + d.water });
+  logIt("water", "Cup " + d.water);
+  save(); renderWater();
+  if (curPage === "tracking") refreshGlance();
+}
+function setCups(n) {
+  const d = D();
+  d.water = n;
+  save(); renderWater();
+  if (curPage === "tracking") refreshGlance();
+}
+
+// ─── Groceries ────────────────────────────────────────────────────────────
+function renderGroceries() {
+  if (!S.groceries) S.groceries = [];
+  $("gList").innerHTML = S.groceries.length
+    ? S.groceries.map((g,i)=>`
+        <div class="g-item ${g.done?"done":""}">
+          <button class="circle ${g.done?"done":""}" onclick="togG(${i})">${g.done?"✓":""}</button>
+          <span>${h(g.t)}</span>
+          <button class="g-del" onclick="delG(${i})">×</button>
+        </div>`).join("")
+    : `<div class="empty"><div class="ei">🛒</div>List is empty</div>`;
+}
+function addItem() {
+  const inp = $("gInp");
+  const t = inp.value.trim();
+  if (!t) return;
+  if (!S.groceries) S.groceries = [];
+  S.groceries.push({ t, done: false });
+  inp.value = "";
+  save(); renderGroceries();
+}
+function togG(i) { S.groceries[i].done = !S.groceries[i].done; save(); renderGroceries(); }
+function delG(i) { S.groceries.splice(i,1); save(); renderGroceries(); }
+
+// ─── Tracking ─────────────────────────────────────────────────────────────
+function renderTracking() {
+  refreshGlance();
+  refreshLog();
+  const d = D();
+  $("notesTxt").value = d.notes || "";
+  // restore mood
+  document.querySelectorAll("#moodRow button").forEach(b => {
+    b.classList.toggle("on", b.dataset.m === d.mood);
+  });
+}
+function refreshGlance() {
+  const d = D();
+  const meals  = Object.values(d.meals||{}).filter(Boolean).length;
+  const water  = d.water || 0;
+  const moves  = (d.workouts||[]).filter(w=>w.done).length;
+  const mood   = d.mood || "—";
+  $("tMeals").textContent = meals;
+  $("tWater").textContent = water;
+  $("tMove").textContent  = moves;
+  $("tMood").textContent  = mood;
+}
+function refreshLog() {
+  if (curPage !== "tracking") return;
+  const d = D();
+  const log = d.log || [];
+  $("aLog").innerHTML = log.length
+    ? [...log].reverse().map(e=>`
+        <div class="log-row">
+          <div class="log-t">${e.t}</div>
+          <div class="log-x">${h(e.text)}</div>
+          <span class="tag ${e.type}">${e.type}</span>
+        </div>`).join("")
+    : `<div class="empty"><div class="ei">📊</div>Nothing logged yet today</div>`;
+}
+function pickMood(btn) {
+  document.querySelectorAll("#moodRow button").forEach(b=>b.classList.remove("on"));
+  btn.classList.add("on");
+  D().mood = btn.dataset.m;
+  save(); refreshGlance();
+}
+function saveNotes() {
+  D().notes = $("notesTxt").value;
+  save();
+}
+
+// ─── Boot ─────────────────────────────────────────────────────────────────
+function renderAll() {
+  renderDays();
+  renderSched();
+  renderWorkouts();
+  renderMeals();
+}
+renderAll();
+</script>
+</body>
+</html>
