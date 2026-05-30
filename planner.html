@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daily Planner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#FFF8EF;
+  --surface:#FFFFFF;
+  --ink:#2C2320;
+  --muted:#7A6E6A;
+  --line:rgba(44,35,32,0.10);
+  --line-hi:rgba(44,35,32,0.22);
+  --shadow:0 2px 0 rgba(44,35,32,0.05), 0 4px 16px rgba(44,35,32,0.07);
+  --radius:18px;
+  --radius-sm:12px;
+  --radius-pill:999px;
+  --c-red:#D9534F;
+  --c-red-soft:#FFE8E7;
+  --c-orange:#E8834A;
+  --c-green:#43AA8B;
+  --c-green-soft:#D9F2E8;
+  --c-blue:#4A90E2;
+  --c-blue-soft:#DCEAFB;
+  --c-teal:#48BFE3;
+  --c-yellow:#F9C74F;
+  --c-purple:#9B5DE5;
+}
+html,body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:'Nunito',-apple-system,sans-serif;
+  font-weight:600;
+  line-height:1.55;
+  min-height:100vh;
+}
+.app{max-width:640px;margin:0 auto;padding:14px 12px 40px;}
+
+/* HEADER */
+header{margin-bottom:14px;}
+header h1{
+  font-family:'Fredoka',sans-serif;font-weight:700;font-size:26px;
+  letter-spacing:-0.01em;color:var(--ink);line-height:1;
+}
+header .sub{color:var(--muted);font-size:13px;margin-top:3px;font-weight:600;}
+
+/* TABS NAV — scrollable on mobile, no hidden overflow */
+.tab-nav{
+  display:flex;gap:6px;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+  padding-bottom:2px;
+  margin-top:12px;
+  /* negative margin trick so scroll doesn't clip shadow */
+  margin-left:-12px;padding-left:12px;
+  margin-right:-12px;padding-right:12px;
+}
+.tab-nav::-webkit-scrollbar{display:none;}
+.tab-nav button{
+  flex:0 0 auto;
+  background:var(--surface);
+  border:2px solid var(--line);
+  color:var(--muted);
+  padding:7px 16px;
+  border-radius:var(--radius-pill);
+  font-family:'Fredoka',sans-serif;font-size:14px;font-weight:600;
+  cursor:pointer;white-space:nowrap;
+  transition:all 0.15s ease;
+}
+.tab-nav button:hover{border-color:var(--line-hi);color:var(--ink);}
+.tab-nav button.active{
+  background:var(--c-red);color:#fff;
+  border-color:var(--c-red);
+  box-shadow:0 3px 0 rgba(190,60,50,0.35);
+}
+
+/* DAY SELECTOR */
+.day-label{
+  font-family:'Fredoka',sans-serif;font-size:12px;font-weight:600;
+  color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;
+  margin-bottom:8px;
+}
+.day-pills{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;}
+.day-pills button{
+  background:var(--surface);border:2px solid var(--line);
+  border-radius:var(--radius-pill);
+  font-family:'Fredoka',sans-serif;font-size:14px;font-weight:600;
+  padding:7px 14px;cursor:pointer;
+  transition:all 0.15s ease;color:var(--ink);
+}
+.day-pills button.active{
+  background:#fff;color:var(--c-red);border-color:var(--c-red);
+  box-shadow:0 2px 0 rgba(190,60,50,0.20);
+}
+
+/* CARD */
+.card{
+  background:var(--surface);
+  border:1.5px solid var(--line);
+  border-radius:var(--radius);
+  padding:16px;
+  box-shadow:var(--shadow);
+  margin-bottom:12px;
+}
+.card-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:10px;
+}
+.card-title{
+  font-family:'Fredoka',sans-serif;font-size:14px;font-weight:600;
+  color:var(--muted);letter-spacing:0.06em;text-transform:uppercase;
+  display:flex;align-items:center;gap:6px;
+}
+.card-title .icon{font-size:16px;}
+.cancel-btn{
+  background:none;border:none;cursor:pointer;
+  font-family:'Fredoka',sans-serif;font-size:14px;font-weight:600;
+  color:var(--c-red);padding:0;
+}
+.cancel-btn:hover{opacity:0.75;}
+
+/* SECTION LABEL */
+.section-label{
+  font-family:'Fredoka',sans-serif;font-size:12px;font-weight:600;
+  color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;
+  margin:18px 0 8px;
+}
+
+/* TEXTAREA */
+textarea{
+  width:100%;border:1.5px solid var(--line);border-radius:var(--radius-sm);
+  padding:12px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:600;
+  color:var(--ink);background:var(--bg);resize:vertical;min-height:120px;
+  line-height:1.6;
+}
+textarea:focus{outline:none;border-color:var(--c-red);}
+textarea::placeholder{color:var(--muted);opacity:0.7;}
+
+/* BUTTONS */
+.btn-primary{
+  width:100%;background:var(--c-red);color:#fff;border:none;
+  border-radius:var(--radius-pill);padding:14px;
+  font-family:'Fredoka',sans-serif;font-size:16px;font-weight:600;
+  cursor:pointer;margin-top:10px;
+  box-shadow:0 3px 0 rgba(190,60,50,0.35);
+  transition:all 0.15s ease;
+}
+.btn-primary:hover{transform:translateY(-1px);}
+.btn-primary:active{transform:translateY(1px);box-shadow:none;}
+.btn-secondary{
+  background:var(--surface);border:2px solid var(--line);color:var(--ink);
+  border-radius:var(--radius-pill);padding:10px 18px;
+  font-family:'Fredoka',sans-serif;font-size:14px;font-weight:600;
+  cursor:pointer;transition:all 0.15s ease;
+}
+.btn-secondary:hover{border-color:var(--line-hi);}
+
+/* WORKOUT SECTION */
+.workout-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 0;border-top:1.5px solid var(--line);
+}
+.workout-row:first-child{border-top:none;padding-top:0;}
+.workout-info{display:flex;flex-direction:column;gap:2px;}
+.workout-name{font-family:'Fredoka',sans-serif;font-size:15px;font-weight:600;}
+.workout-meta{font-size:12px;color:var(--muted);}
+.check-btn{
+  width:32px;height:32px;border-radius:50%;border:2px solid var(--line);
+  background:var(--surface);cursor:pointer;display:flex;align-items:center;
+  justify-content:center;font-size:15px;flex-shrink:0;
+  transition:all 0.15s ease;
+}
+.check-btn.done{background:var(--c-green);border-color:var(--c-green);color:#fff;}
+
+/* MEAL ROWS */
+.meal-row{
+  display:flex;align-items:flex-start;gap:12px;
+  padding:12px 0;border-top:1.5px solid var(--line);
+}
+.meal-row:first-child{border-top:none;padding-top:0;}
+.meal-time{
+  font-family:'Fredoka',sans-serif;font-size:13px;color:var(--muted);
+  font-weight:600;min-width:60px;padding-top:2px;
+}
+.meal-input{
+  flex:1;border:none;background:transparent;
+  font-family:'Nunito',sans-serif;font-size:14px;font-weight:600;
+  color:var(--ink);padding:0;line-height:1.5;
+  border-bottom:1.5px solid var(--line);
+}
+.meal-input:focus{outline:none;border-bottom-color:var(--c-red);}
+.meal-input::placeholder{color:var(--muted);opacity:0.6;}
+
+/* WATER TRACKER */
+.water-cups{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;}
+.cup{
+  width:44px;height:52px;border-radius:0 0 10px 10px;
+  border:2px solid var(--c-blue);background:transparent;
+  cursor:pointer;position:relative;overflow:hidden;
+  transition:all 0.15s ease;
+}
+.cup.filled .cup-fill{transform:translateY(0);}
+.cup-fill{
+  position:absolute;bottom:0;left:0;right:0;height:100%;
+  background:var(--c-blue);transform:translateY(100%);
+  transition:transform 0.2s ease;
+}
+.cup-icon{
+  position:absolute;inset:0;display:flex;align-items:center;
+  justify-content:center;font-size:20px;z-index:1;
+}
+.water-goal{font-size:13px;color:var(--muted);margin-bottom:4px;}
+.water-count{
+  font-family:'Fredoka',sans-serif;font-size:28px;font-weight:700;
+  color:var(--c-blue);
+}
+.water-label{font-size:13px;color:var(--muted);}
+
+/* GROCERY LIST */
+.grocery-add{display:flex;gap:8px;margin-bottom:12px;}
+.grocery-input{
+  flex:1;border:1.5px solid var(--line);border-radius:var(--radius-pill);
+  padding:10px 16px;font-family:'Nunito',sans-serif;font-size:14px;
+  font-weight:600;color:var(--ink);background:var(--surface);
+}
+.grocery-input:focus{outline:none;border-color:var(--c-red);}
+.grocery-items{display:flex;flex-direction:column;gap:4px;}
+.grocery-item{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 12px;border-radius:var(--radius-sm);
+  background:var(--bg);
+}
+.grocery-item.checked .grocery-text{
+  text-decoration:line-through;color:var(--muted);
+}
+.grocery-check{
+  width:22px;height:22px;border-radius:50%;border:2px solid var(--line);
+  background:var(--surface);cursor:pointer;display:flex;align-items:center;
+  justify-content:center;font-size:12px;flex-shrink:0;
+  transition:all 0.15s ease;
+}
+.grocery-check.done{background:var(--c-green);border-color:var(--c-green);color:#fff;}
+.grocery-text{flex:1;font-size:14px;}
+.grocery-del{background:none;border:none;cursor:pointer;color:var(--muted);font-size:16px;padding:0 4px;}
+
+/* TRACKING */
+.track-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.track-card{
+  background:var(--surface);border:1.5px solid var(--line);
+  border-radius:var(--radius-sm);padding:14px;text-align:center;
+}
+.track-card .track-emoji{font-size:24px;margin-bottom:6px;}
+.track-card .track-val{
+  font-family:'Fredoka',sans-serif;font-size:28px;font-weight:700;
+  line-height:1;
+}
+.track-card .track-lbl{font-size:12px;color:var(--muted);margin-top:3px;}
+.track-card.meals .track-val{color:var(--c-orange);}
+.track-card.water .track-val{color:var(--c-blue);}
+.track-card.movement .track-val{color:var(--c-green);}
+.track-card.mood .track-val{font-size:22px;}
+
+.log-row{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 0;border-top:1.5px solid var(--line);
+}
+.log-row:first-child{border-top:none;padding-top:0;}
+.log-time{font-family:'Fredoka',sans-serif;font-size:12px;color:var(--muted);min-width:42px;}
+.log-text{flex:1;font-size:13px;}
+.log-type{
+  font-size:11px;font-weight:700;padding:2px 8px;
+  border-radius:var(--radius-pill);letter-spacing:0.04em;
+}
+.log-type.meal{background:var(--c-red-soft);color:var(--c-red);}
+.log-type.water{background:var(--c-blue-soft);color:var(--c-blue);}
+.log-type.move{background:var(--c-green-soft);color:var(--c-green);}
+
+.mood-row{display:flex;gap:8px;flex-wrap:wrap;}
+.mood-btn{
+  background:var(--surface);border:2px solid var(--line);
+  border-radius:var(--radius-pill);padding:8px 14px;
+  font-size:20px;cursor:pointer;transition:all 0.15s ease;
+}
+.mood-btn.selected{border-color:var(--c-yellow);background:var(--c-yellow);}
+
+/* EMPTY STATE */
+.empty{
+  text-align:center;padding:32px 16px;color:var(--muted);
+  font-size:14px;
+}
+.empty .e-icon{font-size:36px;margin-bottom:8px;}
+
+/* FOOTER */
+footer{
+  text-align:center;color:var(--muted);font-size:12px;
+  margin-top:24px;padding-top:16px;border-top:1.5px solid var(--line);
+}
+
+/* HIDDEN */
+[hidden]{display:none!important;}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+
+  <header>
+    <h1>Daily Planner</h1>
+    <div class="sub">meals &middot; movement &middot; hydration</div>
+  </header>
+
+  <nav class="tab-nav" id="tabNav">
+    <button class="active" data-tab="plan" onclick="switchTab('plan')">📋 Plan</button>
+    <button data-tab="water" onclick="switchTab('water')">💧 Water</button>
+    <button data-tab="groceries" onclick="switchTab('groceries')">🛒 Groceries</button>
+    <button data-tab="tracking" onclick="switchTab('tracking')">📊 Tracking</button>
+  </nav>
+
+  <!-- PLAN TAB -->
+  <div id="tab-plan">
+    <div class="section-label">Day</div>
+    <div class="day-pills" id="dayPills"></div>
+
+    <!-- Schedule card -->
+    <div class="card" id="scheduleCard">
+      <div class="card-header">
+        <div class="card-title"><span class="icon">📅</span> Today's Schedule</div>
+        <button class="cancel-btn" onclick="clearSchedule()">cancel</button>
+      </div>
+      <p style="font-size:14px;color:var(--muted);margin-bottom:10px;">Paste your calendar or type your day — client times, errands, anything that affects meal timing.</p>
+      <textarea id="scheduleInput" rows="5" placeholder="e.g.&#10;9:00 client&#10;10:00 client&#10;11:30 lunch break&#10;1:00 client"></textarea>
+      <button class="btn-primary" onclick="saveSchedule()">Save schedule</button>
+    </div>
+
+    <!-- Workout -->
+    <div class="section-label">Workout</div>
+    <div class="card" id="workoutCard">
+      <div id="workoutList"></div>
+      <button class="btn-secondary" style="width:100%;margin-top:10px;" onclick="addWorkout()">+ Add workout</button>
+    </div>
+
+    <!-- Meals -->
+    <div class="section-label">Meals</div>
+    <div class="card">
+      <div id="mealList"></div>
+    </div>
+  </div>
+
+  <!-- WATER TAB -->
+  <div id="tab-water" hidden>
+    <div class="section-label">Hydration goal</div>
+    <div class="card">
+      <div class="water-goal">Daily goal: <strong id="waterGoalLabel">8 cups</strong></div>
+      <div class="water-count" id="waterCount">0</div>
+      <div class="water-label">cups today</div>
+      <div class="water-cups" id="waterCups" style="margin-top:14px;"></div>
+      <button class="btn-primary" onclick="logWater()">+ Log a cup</button>
+    </div>
+    <div class="section-label">Water log</div>
+    <div class="card">
+      <div id="waterLog"><div class="empty"><div class="e-icon">💧</div>No water logged yet</div></div>
+    </div>
+  </div>
+
+  <!-- GROCERIES TAB -->
+  <div id="tab-groceries" hidden>
+    <div class="section-label">Shopping list</div>
+    <div class="card">
+      <div class="grocery-add">
+        <input class="grocery-input" id="groceryInput" type="text" placeholder="Add item…" onkeydown="if(event.key==='Enter')addGrocery()">
+        <button class="btn-primary" style="width:auto;padding:10px 18px;margin-top:0;" onclick="addGrocery()">Add</button>
+      </div>
+      <div class="grocery-items" id="groceryItems">
+        <div class="empty"><div class="e-icon">🛒</div>List is empty</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TRACKING TAB -->
+  <div id="tab-tracking" hidden>
+    <div class="section-label">Today at a glance</div>
+    <div class="track-grid">
+      <div class="track-card meals">
+        <div class="track-emoji">🍽️</div>
+        <div class="track-val" id="trkMeals">0</div>
+        <div class="track-lbl">meals logged</div>
+      </div>
+      <div class="track-card water">
+        <div class="track-emoji">💧</div>
+        <div class="track-val" id="trkWater">0</div>
+        <div class="track-lbl">cups of water</div>
+      </div>
+      <div class="track-card movement">
+        <div class="track-emoji">🏃</div>
+        <div class="track-val" id="trkMove">0</div>
+        <div class="track-lbl">workouts done</div>
+      </div>
+      <div class="track-card mood">
+        <div class="track-emoji">😊</div>
+        <div class="track-val" id="trkMood">—</div>
+        <div class="track-lbl">mood</div>
+      </div>
+    </div>
+
+    <!-- Mood -->
+    <div class="section-label">Mood check-in</div>
+    <div class="card">
+      <div class="mood-row" id="moodRow">
+        <button class="mood-btn" data-mood="😄" onclick="setMood(this)">😄</button>
+        <button class="mood-btn" data-mood="🙂" onclick="setMood(this)">🙂</button>
+        <button class="mood-btn" data-mood="😐" onclick="setMood(this)">😐</button>
+        <button class="mood-btn" data-mood="😔" onclick="setMood(this)">😔</button>
+        <button class="mood-btn" data-mood="😤" onclick="setMood(this)">😤</button>
+      </div>
+    </div>
+
+    <!-- Full activity log -->
+    <div class="section-label">Activity log</div>
+    <div class="card">
+      <div id="activityLog"><div class="empty"><div class="e-icon">📊</div>Nothing logged yet today</div></div>
+    </div>
+
+    <!-- Notes -->
+    <div class="section-label">Notes</div>
+    <div class="card">
+      <textarea id="trackingNotes" rows="3" placeholder="How did today go? Anything to remember for tomorrow…" oninput="saveNotes()"></textarea>
+    </div>
+  </div>
+
+  <footer>Daily Planner &mdash; data saved in this browser</footer>
+</div>
+
+<script>
+// ─── State ────────────────────────────────────────────────────────────────
+const DAYS = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+const MEALS = [
+  {id:"breakfast", label:"Breakfast"},
+  {id:"am_snack",  label:"AM Snack"},
+  {id:"lunch",     label:"Lunch"},
+  {id:"pm_snack",  label:"PM Snack"},
+  {id:"dinner",    label:"Dinner"},
+  {id:"evening",   label:"Evening"},
+];
+const WATER_GOAL = 8;
+
+let state = load();
+
+function load() {
+  try { return JSON.parse(localStorage.getItem("dailyPlanner") || "{}"); }
+  catch { return {}; }
+}
+function save() {
+  localStorage.setItem("dailyPlanner", JSON.stringify(state));
+}
+
+function today() {
+  return new Date().toISOString().slice(0,10);
+}
+
+function dayKey() {
+  return state.selectedDay !== undefined ? state.selectedDay : new Date().getDay();
+}
+
+function dayData(day) {
+  const k = "day_" + (day !== undefined ? day : dayKey());
+  if (!state[k]) state[k] = { schedule:"", workouts:[], meals:{}, water:0, waterLog:[], mood:"", notes:"", log:[] };
+  return state[k];
+}
+
+// ─── Tab switching ────────────────────────────────────────────────────────
+function switchTab(tab) {
+  document.querySelectorAll(".tab-nav button").forEach(b => b.classList.toggle("active", b.dataset.tab === tab));
+  ["plan","water","groceries","tracking"].forEach(t => {
+    const el = document.getElementById("tab-" + t);
+    if (el) el.hidden = (t !== tab);
+  });
+  if (tab === "tracking") renderTracking();
+  if (tab === "water") renderWater();
+  if (tab === "groceries") renderGroceries();
+}
+
+// ─── Day pills ────────────────────────────────────────────────────────────
+function renderDayPills() {
+  const wrap = document.getElementById("dayPills");
+  wrap.innerHTML = "";
+  const selected = state.selectedDay !== undefined ? state.selectedDay : new Date().getDay();
+  DAYS.forEach((name, i) => {
+    const btn = document.createElement("button");
+    btn.textContent = name;
+    if (i === selected) btn.classList.add("active");
+    btn.onclick = () => { state.selectedDay = i; save(); renderAll(); };
+    wrap.appendChild(btn);
+  });
+}
+
+// ─── Schedule ─────────────────────────────────────────────────────────────
+function renderSchedule() {
+  const d = dayData();
+  document.getElementById("scheduleInput").value = d.schedule || "";
+}
+function saveSchedule() {
+  const d = dayData();
+  d.schedule = document.getElementById("scheduleInput").value;
+  addLog("plan", "Schedule saved");
+  save();
+}
+function clearSchedule() {
+  document.getElementById("scheduleInput").value = "";
+  const d = dayData();
+  d.schedule = "";
+  save();
+}
+
+// ─── Workout ──────────────────────────────────────────────────────────────
+function renderWorkouts() {
+  const d = dayData();
+  const wrap = document.getElementById("workoutList");
+  wrap.innerHTML = "";
+  if (!d.workouts.length) {
+    wrap.innerHTML = '<div class="empty" style="padding:16px 0 8px"><div class="e-icon">🏃</div>No workouts yet</div>';
+    return;
+  }
+  d.workouts.forEach((w, i) => {
+    const row = document.createElement("div");
+    row.className = "workout-row";
+    row.innerHTML = `
+      <div class="workout-info">
+        <div class="workout-name">${esc(w.name)}</div>
+        <div class="workout-meta">${esc(w.meta || "")}</div>
+      </div>
+      <button class="check-btn ${w.done ? "done" : ""}" onclick="toggleWorkout(${i})">${w.done ? "✓" : ""}</button>
+    `;
+    wrap.appendChild(row);
+  });
+}
+function addWorkout() {
+  const name = prompt("Workout name (e.g. 30 min walk, yoga, gym):");
+  if (!name || !name.trim()) return;
+  const meta = prompt("Details (e.g. 30 min, moderate — optional):") || "";
+  const d = dayData();
+  d.workouts.push({ name: name.trim(), meta: meta.trim(), done: false });
+  save(); renderWorkouts();
+}
+function toggleWorkout(i) {
+  const d = dayData();
+  d.workouts[i].done = !d.workouts[i].done;
+  if (d.workouts[i].done) addLog("move", d.workouts[i].name + " completed");
+  save(); renderWorkouts(); renderTrackingGlance();
+}
+
+// ─── Meals ────────────────────────────────────────────────────────────────
+function renderMeals() {
+  const d = dayData();
+  const wrap = document.getElementById("mealList");
+  wrap.innerHTML = "";
+  MEALS.forEach(m => {
+    const row = document.createElement("div");
+    row.className = "meal-row";
+    const inp = document.createElement("input");
+    inp.className = "meal-input";
+    inp.type = "text";
+    inp.placeholder = "What did you " + (m.id === "breakfast" ? "eat?" : "have?");
+    inp.value = d.meals[m.id] || "";
+    inp.onchange = () => {
+      d.meals[m.id] = inp.value.trim();
+      if (d.meals[m.id]) addLog("meal", m.label + ": " + d.meals[m.id]);
+      save(); renderTrackingGlance();
+    };
+    row.innerHTML = `<div class="meal-time">${m.label}</div>`;
+    row.appendChild(inp);
+    wrap.appendChild(row);
+  });
+}
+
+// ─── Water ────────────────────────────────────────────────────────────────
+function renderWater() {
+  const d = dayData();
+  document.getElementById("waterCount").textContent = d.water || 0;
+  document.getElementById("waterGoalLabel").textContent = WATER_GOAL + " cups";
+  // cups grid
+  const wrap = document.getElementById("waterCups");
+  wrap.innerHTML = "";
+  for (let i = 0; i < WATER_GOAL; i++) {
+    const cup = document.createElement("div");
+    cup.className = "cup" + (i < (d.water || 0) ? " filled" : "");
+    cup.innerHTML = '<div class="cup-fill"></div><div class="cup-icon">🥛</div>';
+    cup.onclick = () => {
+      d.water = (i < (d.water || 0)) ? i : i + 1;
+      save(); renderWater();
+    };
+    wrap.appendChild(cup);
+  }
+  // log
+  const logEl = document.getElementById("waterLog");
+  if (!d.waterLog || !d.waterLog.length) {
+    logEl.innerHTML = '<div class="empty"><div class="e-icon">💧</div>No water logged yet</div>';
+    return;
+  }
+  logEl.innerHTML = d.waterLog.map(e =>
+    `<div class="log-row"><div class="log-time">${e.time}</div><div class="log-text">${esc(e.text)}</div><span class="log-type water">water</span></div>`
+  ).join("");
+}
+function logWater() {
+  const d = dayData();
+  d.water = (d.water || 0) + 1;
+  if (!d.waterLog) d.waterLog = [];
+  d.waterLog.push({ time: timeNow(), text: "Cup " + d.water });
+  addLog("water", "Cup " + d.water + " logged");
+  save(); renderWater(); renderTrackingGlance();
+}
+
+// ─── Groceries ────────────────────────────────────────────────────────────
+function renderGroceries() {
+  const items = state.groceries || [];
+  const wrap = document.getElementById("groceryItems");
+  if (!items.length) {
+    wrap.innerHTML = '<div class="empty"><div class="e-icon">🛒</div>List is empty</div>';
+    return;
+  }
+  wrap.innerHTML = items.map((item, i) => `
+    <div class="grocery-item ${item.done ? "checked" : ""}">
+      <button class="grocery-check ${item.done ? "done" : ""}" onclick="toggleGrocery(${i})">${item.done ? "✓" : ""}</button>
+      <div class="grocery-text">${esc(item.text)}</div>
+      <button class="grocery-del" onclick="removeGrocery(${i})">×</button>
+    </div>
+  `).join("");
+}
+function addGrocery() {
+  const inp = document.getElementById("groceryInput");
+  const text = inp.value.trim();
+  if (!text) return;
+  if (!state.groceries) state.groceries = [];
+  state.groceries.push({ text, done: false });
+  inp.value = "";
+  save(); renderGroceries();
+}
+function toggleGrocery(i) {
+  state.groceries[i].done = !state.groceries[i].done;
+  save(); renderGroceries();
+}
+function removeGrocery(i) {
+  state.groceries.splice(i, 1);
+  save(); renderGroceries();
+}
+
+// ─── Tracking ─────────────────────────────────────────────────────────────
+function renderTracking() {
+  renderTrackingGlance();
+  renderActivityLog();
+  const d = dayData();
+  const notesEl = document.getElementById("trackingNotes");
+  if (notesEl) notesEl.value = d.notes || "";
+  // restore mood selection
+  if (d.mood) {
+    document.querySelectorAll(".mood-btn").forEach(b => {
+      b.classList.toggle("selected", b.dataset.mood === d.mood);
+    });
+  }
+}
+function renderTrackingGlance() {
+  const d = dayData();
+  const mealsLogged = Object.values(d.meals || {}).filter(v => v).length;
+  const waterCount = d.water || 0;
+  const workoutsDone = (d.workouts || []).filter(w => w.done).length;
+  const mood = d.mood || "—";
+  const trkMeals = document.getElementById("trkMeals");
+  const trkWater = document.getElementById("trkWater");
+  const trkMove = document.getElementById("trkMove");
+  const trkMood = document.getElementById("trkMood");
+  if (trkMeals) trkMeals.textContent = mealsLogged;
+  if (trkWater) trkWater.textContent = waterCount;
+  if (trkMove) trkMove.textContent = workoutsDone;
+  if (trkMood) trkMood.textContent = mood;
+}
+function renderActivityLog() {
+  const d = dayData();
+  const wrap = document.getElementById("activityLog");
+  if (!wrap) return;
+  const log = d.log || [];
+  if (!log.length) {
+    wrap.innerHTML = '<div class="empty"><div class="e-icon">📊</div>Nothing logged yet today</div>';
+    return;
+  }
+  wrap.innerHTML = [...log].reverse().map(e =>
+    `<div class="log-row">
+      <div class="log-time">${e.time}</div>
+      <div class="log-text">${esc(e.text)}</div>
+      <span class="log-type ${e.type}">${e.type}</span>
+    </div>`
+  ).join("");
+}
+function addLog(type, text) {
+  const d = dayData();
+  if (!d.log) d.log = [];
+  d.log.push({ time: timeNow(), type, text });
+  renderActivityLog();
+}
+function setMood(btn) {
+  document.querySelectorAll(".mood-btn").forEach(b => b.classList.remove("selected"));
+  btn.classList.add("selected");
+  const d = dayData();
+  d.mood = btn.dataset.mood;
+  save();
+  renderTrackingGlance();
+}
+function saveNotes() {
+  const d = dayData();
+  d.notes = document.getElementById("trackingNotes").value;
+  save();
+}
+
+// ─── Helpers ──────────────────────────────────────────────────────────────
+function timeNow() {
+  return new Date().toLocaleTimeString([], { hour:"2-digit", minute:"2-digit" });
+}
+function esc(s) {
+  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+// ─── Initial render ───────────────────────────────────────────────────────
+function renderAll() {
+  renderDayPills();
+  renderSchedule();
+  renderWorkouts();
+  renderMeals();
+}
+renderAll();
+</script>
+</body>
+</html>
